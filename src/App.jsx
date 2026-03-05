@@ -1,16 +1,11 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 
-const SCRIPT_URL = "https://script.google.com/u/1/home/projects/1FBnrDegp9aN1UmIyGLc7-buanYG4I4i3QhaWfvCD5TbXoT1BcS6Nopz3/edit";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqse0YxtXVG19fbxO2NB7HCv6E5iN5UvhS8UBXT3KwemNdR-V5hAL2xCogTtcHpOTY/exec";
 const CLOUD_NAME = "djp34wxni";
 const CLOUD_PRESET = "school_attendance";
 
-const SHIFTS = {
-  morning: { label: "Mañana" },
-  afternoon: { label: "Tarde" },
-};
-
 function getCurrentShift() {
-  return new Date().getHours() < 13 ? "morning" : "afternoon";
+  return new Date().getHours() < 13 ? "Mañana" : "Tarde";
 }
 
 async function uploadPhoto(base64) {
@@ -36,85 +31,77 @@ async function saveRecord(record) {
   });
 }
 
+// ── SCANNER usando ZXing (más potente en móviles) ──
 function Scanner({ onScanned }) {
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const streamRef = useRef(null);
-  const rafRef = useRef(null);
-  const [status, setStatus] = useState("Apuntá al código QR del alumno");
+  const [status, setStatus] = useState("Iniciando cámara...");
+  const [error, setError] = useState(null);
+  const readerRef = useRef(null);
 
-  useCallback(() => {
-    start();
-    return () => stop();
-  }, []);
+  useEffect(() => {
+    let controls = null;
 
-  useState(() => {
-    start();
-    return () => stop();
-  });
+    async function startScanner() {
+      try {
+        const { BrowserMultiFormatReader, NotFoundException } = await import(
+          "https://cdn.jsdelivr.net/npm/@zxing/library@0.21.0/esm/index.js"
+        );
+        const codeReader = new BrowserMultiFormatReader();
+        readerRef.current = codeReader;
 
- async function start() {
-    try {
-      // Cargar jsQR una sola vez
-      if (!window._jsQR) {
-        const mod = await import("https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js");
-        window._jsQR = mod.default;
-      }
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: "environment" },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-      });
-      streamRef.current = stream;
-      videoRef.current.srcObject = stream;
-      videoRef.current.setAttribute("playsinline", true);
-      await videoRef.current.play();
-      setStatus("📷 Listo — apuntá al QR");
-      scanLoop();
-    } catch (e) {
-      setStatus("⚠️ Sin acceso a cámara: " + e.message);
-    }
-  }
-  }
+        const devices = await BrowserMultiFormatReader.listVideoInputDevices();
+        // Preferir cámara trasera
+        const backCamera = devices.find(d =>
+          d.label.toLowerCase().includes("back") ||
+          d.label.toLowerCase().includes("rear") ||
+          d.label.toLowerCase().includes("trasera") ||
+          d.label.toLowerCase().includes("environment")
+        );
+        const deviceId = backCamera ? backCamera.deviceId : devices[devices.length - 1]?.deviceId;
 
-  function stop() {
-    cancelAnimationFrame(rafRef.current);
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-  }
-function scanLoop() {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas) return;
+        setStatus("📷 Apuntá al código QR");
 
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-      const ctx = canvas.getContext("2d");
-      canvas.width = 640;
-      canvas.height = 480;
-      ctx.drawImage(video, 0, 0, 640, 480);
-      const img = ctx.getImageData(0, 0, 640, 480);
-
-      if (window._jsQR) {
-        const code = window._jsQR(img.data, img.width, img.height, {
-          inversionAttempts: "dontInvert",
-        });
-        if (code?.data) {
-          stop();
-          onScanned(code.data);
-          return;
-        }
+        controls = await codeReader.decodeFromVideoDevice(
+          deviceId,
+          "qr-video",
+          (result, err) => {
+            if (result) {
+              onScanned(result.getText());
+            }
+          }
+        );
+      } catch (e) {
+        setError("Error de cámara: " + e.message);
       }
     }
-    rafRef.current = requestAnimationFrame(scanLoop);
-  }
+
+    startScanner();
+
+    return () => {
+      if (readerRef.current) {
+        readerRef.current.reset();
+      }
+    };
+  }, [onScanned]);
+
+  if (error) {
+    return (
+      <div style={S.card("#ff5252")}>
+        <div style={{ fontSize: 48 }}>⚠️</div>
+        <p style={{ color: "#ff5252", textAlign: "center" }}>{error}</p>
+      </div>
+    );
   }
 
   return (
     <div style={S.scanWrap}>
       <div style={S.videoBox}>
-        <video ref={videoRef} style={S.video} muted playsInline />
-        <canvas ref={canvasRef} style={{ display: "none" }} />
+        <video
+          id="qr-video"
+          style={S.video}
+          muted
+          playsInline
+          autoPlay
+        />
         <div style={S.overlay}>
           <div style={S.box}>
             {["tl","tr","bl","br"].map((p) => (
@@ -129,6 +116,7 @@ function scanLoop() {
   );
 }
 
+// ── CÁMARA FRONTAL ──
 function Camera({ student, onCapture, onCancel }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -136,20 +124,24 @@ function Camera({ student, onCapture, onCancel }) {
   const [photo, setPhoto] = useState(null);
   const [ready, setReady] = useState(false);
 
-  useState(() => {
+  useEffect(() => {
     startFront();
     return () => streamRef.current?.getTracks().forEach((t) => t.stop());
-  });
+  }, []);
 
   async function startFront() {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user" },
-    });
-    streamRef.current = stream;
-    videoRef.current.srcObject = stream;
-    videoRef.current.setAttribute("playsinline", true);
-    await videoRef.current.play();
-    setReady(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" },
+      });
+      streamRef.current = stream;
+      videoRef.current.srcObject = stream;
+      videoRef.current.setAttribute("playsinline", true);
+      await videoRef.current.play();
+      setReady(true);
+    } catch (e) {
+      alert("Error cámara frontal: " + e.message);
+    }
   }
 
   function snap() {
@@ -165,20 +157,35 @@ function Camera({ student, onCapture, onCancel }) {
     <div style={S.camWrap}>
       <div style={S.studentTag}>
         <span style={S.sid}>#{student.id}</span>
-        <span style={S.sname}>{student.name}</span>
+        <span style={S.sname}>{student.name || "Alumno"}</span>
       </div>
       {!photo ? (
         <div style={S.videoBox}>
-          <video ref={videoRef} style={{ ...S.video, transform: "scaleX(-1)" }} muted playsInline />
+          <video
+            ref={videoRef}
+            style={{ ...S.video, transform: "scaleX(-1)" }}
+            muted
+            playsInline
+          />
           <canvas ref={canvasRef} style={{ display: "none" }} />
-          <button onClick={snap} disabled={!ready} style={S.snapBtn}>📸</button>
+          <button onClick={snap} disabled={!ready} style={S.snapBtn}>
+            📸
+          </button>
         </div>
       ) : (
         <>
-          <img src={photo} style={{ ...S.video, borderRadius: 20, transform: "scaleX(-1)" }} alt="preview" />
+          <img
+            src={photo}
+            style={{ ...S.video, borderRadius: 20, transform: "scaleX(-1)" }}
+            alt="preview"
+          />
           <div style={S.row}>
-            <button onClick={() => { setPhoto(null); startFront(); }} style={S.btnRed}>🔄 Repetir</button>
-            <button onClick={() => onCapture(photo)} style={S.btnGreen}>✅ Confirmar</button>
+            <button onClick={() => { setPhoto(null); startFront(); }} style={S.btnRed}>
+              🔄 Repetir
+            </button>
+            <button onClick={() => onCapture(photo)} style={S.btnGreen}>
+              ✅ Confirmar
+            </button>
           </div>
         </>
       )}
@@ -201,7 +208,9 @@ function Success({ record, onNext }) {
       {record.photoUrl && (
         <img src={record.photoUrl} style={S.thumb} alt="foto" />
       )}
-      <button onClick={onNext} style={S.btnPrimary}>Escanear siguiente →</button>
+      <button onClick={onNext} style={S.btnPrimary}>
+        Escanear siguiente →
+      </button>
     </div>
   );
 }
@@ -229,6 +238,7 @@ function Loading({ text }) {
   );
 }
 
+// ── APP PRINCIPAL ──
 export default function App() {
   const [phase, setPhase] = useState("scan");
   const [student, setStudent] = useState(null);
@@ -240,18 +250,18 @@ export default function App() {
     JSON.parse(localStorage.getItem("done") || "[]")
   );
   const shift = getCurrentShift();
-  const shiftLabel = SHIFTS[shift].label;
 
   function onScanned(qr) {
-    const [id, ...rest] = qr.split("|");
-    const name = rest.join(" ").trim();
+    const parts = qr.split("|");
+    const id = parts[0].trim();
+    const name = parts.slice(1).join(" ").trim();
     const key = `${id}_${shift}_${new Date().toLocaleDateString("es-AR")}`;
     if (done.includes(key)) {
-      setDupInfo({ name: name || id, shift: shiftLabel });
+      setDupInfo({ name: name || id, shift });
       setPhase("duplicate");
       return;
     }
-    setStudent({ id: id.trim(), name });
+    setStudent({ id, name });
     setPhase("capture");
   }
 
@@ -266,7 +276,7 @@ export default function App() {
         name: student.name,
         date: now.toLocaleDateString("es-AR"),
         time: now.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }),
-        shift: shiftLabel,
+        shift,
         photoUrl,
       };
       setLoadTxt("Guardando en planilla...");
@@ -293,7 +303,7 @@ export default function App() {
           <span style={{ fontSize: 28 }}>🏫</span>
           <div>
             <h1 style={S.title}>Asistencia QR</h1>
-            <span style={S.badge}>Turno {shiftLabel}</span>
+            <span style={S.badge}>Turno {shift}</span>
           </div>
         </div>
         <div style={S.counter}>
@@ -313,9 +323,10 @@ export default function App() {
 }
 
 const C = {
-  bg: "#0a0f1e", surface: "#111827", card: "#1a2235",
-  accent: "#00e5ff", green: "#00e676", text: "#e8eaf6",
-  muted: "#8892a4", border: "rgba(0,229,255,0.15)"
+  bg: "#0a0f1e", surface: "#111827",
+  accent: "#00e5ff", green: "#00e676",
+  text: "#e8eaf6", muted: "#8892a4",
+  border: "rgba(0,229,255,0.15)"
 };
 
 const S = {
