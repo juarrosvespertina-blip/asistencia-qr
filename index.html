@@ -1,27 +1,265 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0a0f1e" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Asistencia QR" />
-  <link rel="manifest" href="/manifest.json" />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="theme-color" content="#0a0f1e"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="Asistencia QR"/>
   <title>Asistencia QR Escolar</title>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0a0f1e; overscroll-behavior: none; }
-    #root { min-height: 100dvh; }
-    @keyframes scanAnim {
-      0% { top: 5%; } 50% { top: 90%; } 100% { top: 5%; }
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    ::-webkit-scrollbar { display: none; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#0a0f1e;font-family:'Segoe UI',sans-serif;color:#e8eaf6;min-height:100vh}
+    #app{max-width:480px;margin:0 auto;display:flex;flex-direction:column;min-height:100vh}
+    header{padding:12px 16px;background:#111827;border-bottom:1px solid rgba(0,229,255,0.15);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+    .logo{display:flex;align-items:center;gap:10}
+    h1{font-size:18px;font-weight:800;color:#00e5ff;margin:0}
+    .badge{font-size:11px;background:rgba(0,229,255,0.12);color:#00e5ff;border:1px solid rgba(0,229,255,0.15);border-radius:20px;padding:2px 8px;font-weight:700}
+    .counter{text-align:center;background:rgba(0,229,255,0.12);border:1px solid rgba(0,229,255,0.15);border-radius:12px;padding:6px 14px}
+    .counter-num{display:block;font-size:22px;font-weight:900;color:#00e5ff}
+    .counter-lbl{font-size:10px;color:#8892a4}
+    main{flex:1;padding:16px;display:flex;flex-direction:column;gap:16px}
+    #qr-reader{width:100%;border-radius:20px;overflow:hidden;border:2px solid rgba(0,229,255,0.15)}
+    #qr-reader video{border-radius:18px}
+    .hint{color:#8892a4;font-size:14px;text-align:center}
+    .card{background:#1a2235;border-radius:24px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+    .card-icon{font-size:64px}
+    .card-title{font-size:22px;font-weight:800;margin:0}
+    .grid{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;width:100%;background:rgba(0,0,0,0.2);border-radius:12px;padding:16px;text-align:left}
+    .lbl{color:#8892a4;font-size:13px}
+    .val{color:#e8eaf6;font-size:13px;font-weight:700}
+    .student-tag{background:#1a2235;border-radius:16px;padding:16px;border:1px solid rgba(0,229,255,0.15);display:flex;align-items:center;gap:10}
+    .sid{background:rgba(0,229,255,0.12);color:#00e5ff;border-radius:8px;padding:4px 10px;font-size:13px;font-weight:800;border:1px solid rgba(0,229,255,0.15)}
+    .sname{font-size:16px;font-weight:700}
+    .video-box{position:relative;width:100%;aspect-ratio:4/3;border-radius:20px;overflow:hidden;background:#000;border:2px solid rgba(0,229,255,0.15)}
+    .video-box video{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)}
+    .video-box img{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1);border-radius:18px}
+    .snap-btn{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;background:#00e5ff;border:none;font-size:28px;cursor:pointer;box-shadow:0 0 20px #00e5ff}
+    .row{display:flex;gap:10;width:100%}
+    .btn-red{flex:1;padding:12px;border-radius:12px;background:rgba(255,82,82,0.15);border:1px solid #ff5252;color:#ff5252;font-weight:700;font-size:14px;cursor:pointer}
+    .btn-green{flex:1;padding:12px;border-radius:12px;background:rgba(0,230,118,0.15);border:1px solid #00e676;color:#00e676;font-weight:700;font-size:14px;cursor:pointer}
+    .btn-ghost{padding:10px;border-radius:12px;background:transparent;border:1px solid rgba(0,229,255,0.15);color:#8892a4;font-size:13px;cursor:pointer;width:100%}
+    .btn-primary{width:100%;padding:14px;border-radius:14px;background:#00e5ff;border:none;color:#000;font-weight:900;font-size:16px;cursor:pointer}
+    .thumb{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #00e676;transform:scaleX(-1)}
+    .spinner{width:56px;height:56px;border:4px solid rgba(0,229,255,0.15);border-top:4px solid #00e5ff;border-radius:50%;animation:spin 0.8s linear infinite}
+    .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:20;min-height:300px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .hidden{display:none!important}
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
+<div id="app">
+  <header>
+    <div class="logo">
+      <span style="font-size:28px">🏫</span>
+      <div>
+        <h1>Asistencia QR</h1>
+        <span class="badge" id="shift-badge">Turno ...</span>
+      </div>
+    </div>
+    <div class="counter">
+      <span class="counter-num" id="count-num">0</span>
+      <span class="counter-lbl">HOY</span>
+    </div>
+  </header>
+  <main id="main"></main>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqse0YxtXVG19fbxO2NB7HCv6E5iN5UvhS8UBXT3KwemNdR-V5hAL2xCogTtcHpOTY/exec";
+const CLOUD_NAME = "djp34wxni";
+const CLOUD_PRESET = "school_attendance";
+
+let count = +localStorage.getItem("count") || 0;
+let done = JSON.parse(localStorage.getItem("done") || "[]");
+let currentStudent = null;
+let scanner = null;
+
+function getShift() { return new Date().getHours() < 13 ? "Mañana" : "Tarde"; }
+
+function updateHeader() {
+  document.getElementById("shift-badge").textContent = "Turno " + getShift();
+  document.getElementById("count-num").textContent = count;
+}
+
+async function uploadPhoto(base64) {
+  const blob = await (await fetch(base64)).blob();
+  const fd = new FormData();
+  fd.append("file", blob);
+  fd.append("upload_preset", CLOUD_PRESET);
+  fd.append("folder", "asistencia_escolar");
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method:"POST", body:fd });
+  const data = await res.json();
+  return data.secure_url;
+}
+
+async function saveRecord(record) {
+  await fetch(SCRIPT_URL, {
+    method:"POST", mode:"no-cors",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(record)
+  });
+}
+
+function stopScanner() {
+  if (scanner) { scanner.stop().catch(()=>{}); scanner = null; }
+}
+
+function showScan() {
+  stopScanner();
+  const main = document.getElementById("main");
+  main.innerHTML = `
+    <div>
+      <div id="qr-reader"></div>
+      <p class="hint" id="scan-hint">Iniciando cámara...</p>
+    </div>
+  `;
+
+  Html5Qrcode.getCameras().then(devices => {
+    if (!devices.length) { document.getElementById("scan-hint").textContent = "⚠️ No se encontró cámara"; return; }
+    const back = devices.find(d => /back|rear|trasera|environment/i.test(d.label));
+    const camId = back ? back.id : devices[devices.length-1].id;
+    scanner = new Html5Qrcode("qr-reader");
+    scanner.start(
+      camId,
+      { fps:15, qrbox:{width:250,height:250} },
+      (text) => { stopScanner(); handleScanned(text); },
+      () => {}
+    ).then(() => {
+      document.getElementById("scan-hint").textContent = "📷 Apuntá al código QR del alumno";
+    }).catch(e => {
+      document.getElementById("scan-hint").textContent = "⚠️ Error: " + e;
+    });
+  }).catch(e => {
+    document.getElementById("scan-hint").textContent = "⚠️ Error cámara: " + e;
+  });
+}
+
+function handleScanned(qr) {
+  const parts = qr.split("|");
+  const id = parts[0].trim();
+  const name = parts.slice(1).join(" ").trim();
+  const shift = getShift();
+  const key = `${id}_${shift}_${new Date().toLocaleDateString("es-AR")}`;
+  if (done.includes(key)) { showDuplicate(name||id, shift); return; }
+  currentStudent = { id, name };
+  showCapture();
+}
+
+function showCapture() {
+  const main = document.getElementById("main");
+  main.innerHTML = `
+    <div class="student-tag">
+      <span class="sid">#${currentStudent.id}</span>
+      <span class="sname">${currentStudent.name || "Alumno"}</span>
+    </div>
+    <div class="video-box" id="cam-box">
+      <video id="front-video" muted playsinline autoplay></video>
+      <button class="snap-btn" id="snap-btn" disabled>📸</button>
+    </div>
+    <button class="btn-ghost" onclick="showScan()">Cancelar</button>
+  `;
+
+  navigator.mediaDevices.getUserMedia({ video:{ facingMode:"user" } })
+    .then(stream => {
+      const video = document.getElementById("front-video");
+      video.srcObject = stream;
+      video.play();
+      document.getElementById("snap-btn").disabled = false;
+      document.getElementById("snap-btn").onclick = () => snapPhoto(stream);
+    })
+    .catch(e => alert("Error cámara frontal: " + e.message));
+}
+
+function snapPhoto(stream) {
+  const video = document.getElementById("front-video");
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext("2d").drawImage(video, 0, 0);
+  const photo = canvas.toDataURL("image/jpeg", 0.8);
+  stream.getTracks().forEach(t => t.stop());
+
+  const box = document.getElementById("cam-box");
+  box.innerHTML = `<img src="${photo}" alt="preview"/>`;
+
+  const main = document.getElementById("main");
+  const row = document.createElement("div");
+  row.className = "row";
+  row.innerHTML = `
+    <button class="btn-red" id="retake-btn">🔄 Repetir</button>
+    <button class="btn-green" id="confirm-btn">✅ Confirmar</button>
+  `;
+  box.after(row);
+
+  document.getElementById("retake-btn").onclick = showCapture;
+  document.getElementById("confirm-btn").onclick = () => confirmPhoto(photo);
+}
+
+async function confirmPhoto(photo) {
+  const main = document.getElementById("main");
+  main.innerHTML = `<div class="loading"><div class="spinner"></div><p style="color:#8892a4">Subiendo foto...</p></div>`;
+
+  try {
+    const photoUrl = await uploadPhoto(photo);
+    main.querySelector("p").textContent = "Guardando en planilla...";
+    const now = new Date();
+    const shift = getShift();
+    const record = {
+      id: currentStudent.id,
+      name: currentStudent.name,
+      date: now.toLocaleDateString("es-AR"),
+      time: now.toLocaleTimeString("es-AR", {hour:"2-digit",minute:"2-digit"}),
+      shift, photoUrl
+    };
+    await saveRecord(record);
+    const key = `${record.id}_${shift}_${record.date}`;
+    done.push(key);
+    localStorage.setItem("done", JSON.stringify(done));
+    count++;
+    localStorage.setItem("count", count);
+    updateHeader();
+    showSuccess(record);
+  } catch(e) {
+    alert("Error: " + e.message);
+    showScan();
+  }
+}
+
+function showSuccess(record) {
+  const main = document.getElementById("main");
+  main.innerHTML = `
+    <div class="card" style="border:1px solid #00e67633">
+      <div class="card-icon">✅</div>
+      <h2 class="card-title" style="color:#00e676">¡Registrado!</h2>
+      <div class="grid">
+        <span class="lbl">Alumno</span><span class="val">${record.name}</span>
+        <span class="lbl">ID</span><span class="val">${record.id}</span>
+        <span class="lbl">Turno</span><span class="val">${record.shift}</span>
+        <span class="lbl">Hora</span><span class="val">${record.time}</span>
+      </div>
+      ${record.photoUrl ? `<img src="${record.photoUrl}" class="thumb" alt="foto"/>` : ""}
+      <button class="btn-primary" onclick="showScan()">Escanear siguiente →</button>
+    </div>
+  `;
+}
+
+function showDuplicate(name, shift) {
+  const main = document.getElementById("main");
+  main.innerHTML = `
+    <div class="card" style="border:1px solid #ff980033">
+      <div class="card-icon">⚠️</div>
+      <h2 class="card-title" style="color:#ff9800">Ya registrado</h2>
+      <p style="color:#8892a4"><b style="color:#e8eaf6">${name}</b> ya fue registrado en el turno <b style="color:#e8eaf6">${shift}</b>.</p>
+      <button class="btn-primary" onclick="showScan()">Escanear otro →</button>
+    </div>
+  `;
+}
+
+// Iniciar
+updateHeader();
+showScan();
+</script>
 </body>
 </html>
