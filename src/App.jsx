@@ -53,50 +53,61 @@ function Scanner({ onScanned }) {
     return () => stop();
   });
 
-  async function start() {
+ async function start() {
     try {
+      // Cargar jsQR una sola vez
+      if (!window._jsQR) {
+        const mod = await import("https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js");
+        window._jsQR = mod.default;
+      }
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "environment" } },
+        video: {
+          facingMode: { ideal: "environment" },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
       });
       streamRef.current = stream;
       videoRef.current.srcObject = stream;
       videoRef.current.setAttribute("playsinline", true);
       await videoRef.current.play();
+      setStatus("📷 Listo — apuntá al QR");
       scanLoop();
     } catch (e) {
       setStatus("⚠️ Sin acceso a cámara: " + e.message);
     }
+  }
   }
 
   function stop() {
     cancelAnimationFrame(rafRef.current);
     streamRef.current?.getTracks().forEach((t) => t.stop());
   }
-
-  function scanLoop() {
+function scanLoop() {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
+
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
       const ctx = canvas.getContext("2d");
-      ctx.drawImage(video, 0, 0);
-      const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      import("https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js").then(
-        ({ default: jsQR }) => {
-          const code = jsQR(img.data, img.width, img.height);
-          if (code?.data) {
-            stop();
-            onScanned(code.data);
-            return;
-          }
-          rafRef.current = requestAnimationFrame(scanLoop);
+      canvas.width = 640;
+      canvas.height = 480;
+      ctx.drawImage(video, 0, 0, 640, 480);
+      const img = ctx.getImageData(0, 0, 640, 480);
+
+      if (window._jsQR) {
+        const code = window._jsQR(img.data, img.width, img.height, {
+          inversionAttempts: "dontInvert",
+        });
+        if (code?.data) {
+          stop();
+          onScanned(code.data);
+          return;
         }
-      );
-    } else {
-      rafRef.current = requestAnimationFrame(scanLoop);
+      }
     }
+    rafRef.current = requestAnimationFrame(scanLoop);
+  }
   }
 
   return (
