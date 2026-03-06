@@ -67,7 +67,7 @@
 </div>
 
 <script>
-const SCRIPT_URL = "const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqLogTWlvhZpJJM3_h3fI8rgoDquRiyI7D9Sg1OC5DLWBIb0xLQOMEKOjPRLpS7Uo/exec";
+const SCRIPT_URL = "const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTgBMCZV2YRangbvdIBxKRz02h0rMBzv_kmNfhocHcyrSlwX0FrEO8HZs9xnCbw4S9/exec";
 const CLOUD_NAME = "djp34wxni";
 const CLOUD_PRESET = "school_attendance";
 
@@ -95,11 +95,19 @@ async function uploadPhoto(base64) {
 }
 
 async function saveRecord(record) {
-  await fetch(SCRIPT_URL, {
-    method:"POST", mode:"no-cors",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(record)
+  var params = new URLSearchParams({
+    id: record.id,
+    name: record.name,
+    date: record.date,
+    time: record.time,
+    shift: record.shift,
+    photoUrl: record.photoUrl || ""
   });
+  await fetch(SCRIPT_URL + "?" + params.toString(), {
+    method: "GET",
+    mode: "no-cors"
+  });
+}
 }
 
 function stopScanner() {
