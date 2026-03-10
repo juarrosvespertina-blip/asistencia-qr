@@ -394,13 +394,13 @@
 <script>
 // ── CONFIG ──────────────────────────────────────────────────
 function getConfig() {
-  return {
-    teacher:     localStorage.getItem('cfg_teacher') || '',
-    scriptUrl:   localStorage.getItem('cfg_scriptUrl') || '',
-    cloudName:   localStorage.getItem('cfg_cloudName') || '',
-    cloudPreset: localStorage.getItem('cfg_cloudPreset') || 'school_attendance',
-  };
+  var teacher     = (localStorage.getItem("cfg_teacher") || "").trim();
+  var scriptUrl   = (localStorage.getItem("cfg_scriptUrl") || "").trim();
+  var cloudName   = (localStorage.getItem("cfg_cloudName") || "").trim();
+  var cloudPreset = (localStorage.getItem("cfg_cloudPreset") || "school_attendance").trim();
+  return { teacher: teacher, scriptUrl: scriptUrl, cloudName: cloudName, cloudPreset: cloudPreset };
 }
+
 
 function saveConfig() {
   const teacher     = document.getElementById('cfgTeacher').value.trim();
