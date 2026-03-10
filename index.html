@@ -1,273 +1,696 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta name="theme-color" content="#0a0f1e"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-title" content="Asistencia QR"/>
-  <title>Asistencia QR Escolar</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Asistencia QR</title>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0d1b2a" />
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{background:#0a0f1e;font-family:'Segoe UI',sans-serif;color:#e8eaf6;min-height:100vh}
-    #app{max-width:480px;margin:0 auto;display:flex;flex-direction:column;min-height:100vh}
-    header{padding:12px 16px;background:#111827;border-bottom:1px solid rgba(0,229,255,0.15);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-    .logo{display:flex;align-items:center;gap:10}
-    h1{font-size:18px;font-weight:800;color:#00e5ff;margin:0}
-    .badge{font-size:11px;background:rgba(0,229,255,0.12);color:#00e5ff;border:1px solid rgba(0,229,255,0.15);border-radius:20px;padding:2px 8px;font-weight:700}
-    .counter{text-align:center;background:rgba(0,229,255,0.12);border:1px solid rgba(0,229,255,0.15);border-radius:12px;padding:6px 14px}
-    .counter-num{display:block;font-size:22px;font-weight:900;color:#00e5ff}
-    .counter-lbl{font-size:10px;color:#8892a4}
-    main{flex:1;padding:16px;display:flex;flex-direction:column;gap:16px}
-    #qr-reader{width:100%;border-radius:20px;overflow:hidden;border:2px solid rgba(0,229,255,0.15)}
-    #qr-reader video{border-radius:18px}
-    .hint{color:#8892a4;font-size:14px;text-align:center}
-    .card{background:#1a2235;border-radius:24px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
-    .card-icon{font-size:64px}
-    .card-title{font-size:22px;font-weight:800;margin:0}
-    .grid{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;width:100%;background:rgba(0,0,0,0.2);border-radius:12px;padding:16px;text-align:left}
-    .lbl{color:#8892a4;font-size:13px}
-    .val{color:#e8eaf6;font-size:13px;font-weight:700}
-    .student-tag{background:#1a2235;border-radius:16px;padding:16px;border:1px solid rgba(0,229,255,0.15);display:flex;align-items:center;gap:10}
-    .sid{background:rgba(0,229,255,0.12);color:#00e5ff;border-radius:8px;padding:4px 10px;font-size:13px;font-weight:800;border:1px solid rgba(0,229,255,0.15)}
-    .sname{font-size:16px;font-weight:700}
-    .video-box{position:relative;width:100%;aspect-ratio:4/3;border-radius:20px;overflow:hidden;background:#000;border:2px solid rgba(0,229,255,0.15)}
-    .video-box video{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)}
-    .video-box img{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1);border-radius:18px}
-    .snap-btn{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;background:#00e5ff;border:none;font-size:28px;cursor:pointer;box-shadow:0 0 20px #00e5ff}
-    .row{display:flex;gap:10;width:100%}
-    .btn-red{flex:1;padding:12px;border-radius:12px;background:rgba(255,82,82,0.15);border:1px solid #ff5252;color:#ff5252;font-weight:700;font-size:14px;cursor:pointer}
-    .btn-green{flex:1;padding:12px;border-radius:12px;background:rgba(0,230,118,0.15);border:1px solid #00e676;color:#00e676;font-weight:700;font-size:14px;cursor:pointer}
-    .btn-ghost{padding:10px;border-radius:12px;background:transparent;border:1px solid rgba(0,229,255,0.15);color:#8892a4;font-size:13px;cursor:pointer;width:100%}
-    .btn-primary{width:100%;padding:14px;border-radius:14px;background:#00e5ff;border:none;color:#000;font-weight:900;font-size:16px;cursor:pointer}
-    .thumb{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #00e676;transform:scaleX(-1)}
-    .spinner{width:56px;height:56px;border:4px solid rgba(0,229,255,0.15);border-top:4px solid #00e5ff;border-radius:50%;animation:spin 0.8s linear infinite}
-    .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:20;min-height:300px}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .hidden{display:none!important}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d1b2a;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(135deg, #0d1b2a, #1a3a5c);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #00e5ff33;
+    }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .header-logo { font-size: 28px; }
+    .header-title { font-size: 18px; font-weight: 700; color: #00e5ff; }
+    .header-shift {
+      font-size: 11px; background: #00e5ff22;
+      color: #00e5ff; border: 1px solid #00e5ff44;
+      padding: 2px 8px; border-radius: 20px;
+    }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .header-date {
+      background: #00e5ff;
+      color: #0d1b2a;
+      font-weight: 800;
+      font-size: 22px;
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      line-height: 1;
+    }
+    .header-date span { font-size: 9px; font-weight: 600; }
+    .btn-config {
+      background: #ffffff15;
+      border: 1px solid #ffffff30;
+      color: #ccc;
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── SCREENS ── */
+    .screen { display: none; padding: 16px; }
+    .screen.active { display: block; }
+
+    /* ── SETUP SCREEN ── */
+    .setup-card {
+      background: linear-gradient(135deg, #1a3a5c, #0d2b4a);
+      border: 1px solid #00e5ff33;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 420px;
+      margin: 20px auto;
+    }
+    .setup-icon { font-size: 48px; text-align: center; margin-bottom: 12px; }
+    .setup-title { font-size: 20px; font-weight: 700; color: #00e5ff; text-align: center; margin-bottom: 6px; }
+    .setup-subtitle { font-size: 13px; color: #aaa; text-align: center; margin-bottom: 20px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 12px; color: #00e5ff; font-weight: 600; margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-input {
+      width: 100%;
+      background: #0d1b2a;
+      border: 1px solid #00e5ff44;
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus { border-color: #00e5ff; }
+    .form-hint { font-size: 11px; color: #666; margin-top: 4px; }
+    .btn-save {
+      width: 100%;
+      background: linear-gradient(135deg, #00e5ff, #0099bb);
+      color: #0d1b2a;
+      font-weight: 800;
+      font-size: 16px;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .setup-steps {
+      background: #ffffff08;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+    .setup-step { font-size: 12px; color: #aaa; margin-bottom: 6px; display: flex; gap: 8px; }
+    .setup-step-num { color: #00e5ff; font-weight: 700; min-width: 16px; }
+
+    /* ── SCANNER ── */
+    .scanner-box {
+      background: #1a3a5c22;
+      border: 2px solid #00e5ff33;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    #reader { width: 100%; }
+    .scanner-hint { text-align: center; padding: 12px; font-size: 13px; color: #aaa; }
+
+    /* ── CAPTURE ── */
+    .capture-info {
+      background: linear-gradient(135deg, #1a3a5c, #0d2b4a);
+      border: 1px solid #00e5ff33;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .capture-name { font-size: 20px; font-weight: 700; color: #00e5ff; margin-bottom: 4px; }
+    .capture-meta { font-size: 13px; color: #aaa; }
+    #cameraPreview {
+      width: 100%; border-radius: 12px; background: #000;
+      max-height: 340px; object-fit: cover; display: block;
+    }
+    .capture-btns { display: flex; gap: 10px; margin-top: 12px; }
+    .btn-repeat {
+      flex: 1; padding: 14px; border-radius: 12px;
+      border: 2px solid #ff4444; background: transparent;
+      color: #ff4444; font-weight: 700; font-size: 15px; cursor: pointer;
+    }
+    .btn-confirm {
+      flex: 1.5; padding: 14px; border-radius: 12px;
+      border: none; background: linear-gradient(135deg, #00c851, #007e33);
+      color: #fff; font-weight: 700; font-size: 15px; cursor: pointer;
+    }
+    .btn-cancel {
+      width: 100%; padding: 12px; border-radius: 12px;
+      border: 1px solid #ffffff22; background: transparent;
+      color: #888; font-size: 14px; cursor: pointer; margin-top: 8px;
+    }
+
+    /* ── LOADING ── */
+    .loading-screen {
+      text-align: center; padding: 60px 20px;
+    }
+    .spinner {
+      width: 56px; height: 56px;
+      border: 4px solid #00e5ff33;
+      border-top-color: #00e5ff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── SUCCESS ── */
+    .success-card {
+      background: linear-gradient(135deg, #1a3a5c, #0d2b4a);
+      border: 1px solid #00c85144;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .success-icon { font-size: 64px; margin-bottom: 12px; }
+    .success-title { font-size: 26px; font-weight: 800; color: #00c851; margin-bottom: 16px; }
+    .success-detail {
+      background: #ffffff08;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .detail-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #ffffff10; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { color: #888; font-size: 13px; }
+    .detail-value { color: #fff; font-size: 13px; font-weight: 600; }
+    .success-photo { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #00c851; object-fit: cover; margin: 0 auto 16px; display: block; }
+    .btn-next {
+      width: 100%; padding: 16px; border-radius: 12px;
+      border: none; background: linear-gradient(135deg, #00e5ff, #0099bb);
+      color: #0d1b2a; font-weight: 800; font-size: 16px; cursor: pointer;
+    }
+    .counter-badge {
+      display: inline-block;
+      background: #00e5ff22;
+      border: 1px solid #00e5ff44;
+      color: #00e5ff;
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    /* ── DUPLICATE ── */
+    .duplicate-card {
+      background: linear-gradient(135deg, #2a1a0d, #4a2b0d);
+      border: 1px solid #ff990044;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+    .duplicate-title { font-size: 22px; font-weight: 800; color: #ff9900; margin: 12px 0; }
+
+    /* ── CONFIG MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: #000000cc;
+      z-index: 1000;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .modal-overlay.active { display: flex; align-items: flex-start; justify-content: center; padding-top: 40px; }
+    .modal-card {
+      background: #1a3a5c;
+      border: 1px solid #00e5ff33;
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 420px;
+    }
+    .modal-title { font-size: 18px; font-weight: 700; color: #00e5ff; margin-bottom: 16px; }
+    .btn-close-modal {
+      width: 100%; padding: 12px; border-radius: 10px;
+      border: 1px solid #ffffff22; background: transparent;
+      color: #888; font-size: 14px; cursor: pointer; margin-top: 8px;
+    }
+    .teacher-name-badge {
+      font-size: 12px; color: #aaa; text-align: center; padding: 4px 0 8px;
+    }
   </style>
 </head>
 <body>
-<div id="app">
-  <header>
-    <div class="logo">
-      <span style="font-size:28px">🏫</span>
-      <div>
-        <h1>Asistencia QR</h1>
-        <span class="badge" id="shift-badge">Turno ...</span>
-      </div>
+
+<!-- HEADER -->
+<div class="header" id="mainHeader" style="display:none">
+  <div class="header-left">
+    <div class="header-logo">🏫</div>
+    <div>
+      <div class="header-title">Asistencia QR</div>
+      <div class="header-shift" id="shiftBadge">Turno Mañana</div>
     </div>
-    <div class="counter">
-      <span class="counter-num" id="count-num">0</span>
-      <span class="counter-lbl">HOY</span>
+  </div>
+  <div class="header-right">
+    <div class="header-date">
+      <strong id="dayNum">--</strong>
+      <span>HOY</span>
     </div>
-  </header>
-  <main id="main"></main>
+    <button class="btn-config" onclick="openConfig()" title="Configuración">⚙️</button>
+  </div>
+</div>
+
+<!-- TEACHER BADGE -->
+<div class="teacher-name-badge" id="teacherBadge" style="display:none"></div>
+
+<!-- ── SCREEN: SETUP ── -->
+<div class="screen active" id="screenSetup">
+  <div class="setup-card">
+    <div class="setup-icon">⚙️</div>
+    <div class="setup-title">Configuración inicial</div>
+    <div class="setup-subtitle">Ingresá tus datos una sola vez</div>
+
+    <div class="setup-steps">
+      <div class="setup-step"><span class="setup-step-num">1</span> Creá tu Google Sheets y tu Apps Script</div>
+      <div class="setup-step"><span class="setup-step-num">2</span> Creá tu cuenta en Cloudinary</div>
+      <div class="setup-step"><span class="setup-step-num">3</span> Completá los datos de abajo y guardá</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Tu nombre completo</label>
+      <input class="form-input" id="cfgTeacher" type="text" placeholder="Ej: Prof. García María" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">URL de tu Apps Script</label>
+      <input class="form-input" id="cfgScriptUrl" type="url" placeholder="https://script.google.com/macros/s/..." />
+      <div class="form-hint">La URL que obtuviste al implementar el Apps Script</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cloud Name (Cloudinary)</label>
+      <input class="form-input" id="cfgCloudName" type="text" placeholder="Ej: djp34wxni" />
+      <div class="form-hint">Lo encontrás en el Dashboard de cloudinary.com</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Upload Preset (Cloudinary)</label>
+      <input class="form-input" id="cfgCloudPreset" type="text" placeholder="school_attendance" value="school_attendance" />
+      <div class="form-hint">Por defecto: school_attendance</div>
+    </div>
+    <button class="btn-save" onclick="saveConfig()">✅ Guardar y comenzar</button>
+  </div>
+</div>
+
+<!-- ── SCREEN: SCANNER ── -->
+<div class="screen" id="screenScanner">
+  <div class="scanner-box">
+    <div id="reader"></div>
+  </div>
+  <div class="scanner-hint">📷 Apuntá la cámara al código QR del alumno</div>
+</div>
+
+<!-- ── SCREEN: CAPTURE ── -->
+<div class="screen" id="screenCapture">
+  <div class="capture-info">
+    <div class="capture-name" id="captureName">—</div>
+    <div class="capture-meta" id="captureMeta">—</div>
+  </div>
+  <video id="cameraPreview" autoplay playsinline></video>
+  <div class="capture-btns">
+    <button class="btn-repeat" onclick="retakePhoto()">🔄 Repetir</button>
+    <button class="btn-confirm" onclick="confirmPhoto()">✅ Confirmar</button>
+  </div>
+  <button class="btn-cancel" onclick="cancelCapture()">Cancelar</button>
+</div>
+
+<!-- ── SCREEN: LOADING ── -->
+<div class="screen" id="screenLoading">
+  <div class="loading-screen">
+    <div class="spinner"></div>
+    <p style="color:#aaa;font-size:15px">Guardando registro...</p>
+  </div>
+</div>
+
+<!-- ── SCREEN: SUCCESS ── -->
+<div class="screen" id="screenSuccess">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <div class="success-title">¡Registrado!</div>
+    <div class="counter-badge" id="counterBadge">0 registros hoy</div>
+    <img id="successPhoto" class="success-photo" src="" alt="foto" />
+    <div class="success-detail">
+      <div class="detail-row"><span class="detail-label">Alumno</span><span class="detail-value" id="sName">—</span></div>
+      <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value" id="sId">—</span></div>
+      <div class="detail-row"><span class="detail-label">Docente</span><span class="detail-value" id="sTeacher">—</span></div>
+      <div class="detail-row"><span class="detail-label">Turno</span><span class="detail-value" id="sShift">—</span></div>
+      <div class="detail-row"><span class="detail-label">Hora</span><span class="detail-value" id="sTime">—</span></div>
+    </div>
+    <button class="btn-next" onclick="nextScan()">Escanear siguiente →</button>
+  </div>
+</div>
+
+<!-- ── SCREEN: DUPLICATE ── -->
+<div class="screen" id="screenDuplicate">
+  <div class="duplicate-card">
+    <div style="font-size:56px">⚠️</div>
+    <div class="duplicate-title">Ya registrado</div>
+    <p style="color:#aaa;font-size:14px;margin-bottom:20px">Este alumno ya fue registrado en el turno de hoy.</p>
+    <div class="success-detail">
+      <div class="detail-row"><span class="detail-label">Alumno</span><span class="detail-value" id="dName">—</span></div>
+      <div class="detail-row"><span class="detail-label">Hora previa</span><span class="detail-value" id="dTime">—</span></div>
+    </div>
+    <br>
+    <button class="btn-next" onclick="nextScan()">Escanear siguiente →</button>
+  </div>
+</div>
+
+<!-- ── MODAL: CONFIG ── -->
+<div class="modal-overlay" id="configModal">
+  <div class="modal-card">
+    <div class="modal-title">⚙️ Configuración</div>
+    <div class="form-group">
+      <label class="form-label">Tu nombre completo</label>
+      <input class="form-input" id="modalTeacher" type="text" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">URL de tu Apps Script</label>
+      <input class="form-input" id="modalScriptUrl" type="url" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cloud Name (Cloudinary)</label>
+      <input class="form-input" id="modalCloudName" type="text" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Upload Preset (Cloudinary)</label>
+      <input class="form-input" id="modalCloudPreset" type="text" />
+    </div>
+    <button class="btn-save" onclick="saveConfigModal()">✅ Guardar cambios</button>
+    <button class="btn-close-modal" onclick="closeConfig()">Cancelar</button>
+  </div>
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz77KG50c-mSqkyF0DTg0l3lGdAzSuefI77Te3jD9FRZGCMJX3c_9sWHwStm6KSWDab/exec";
-const CLOUD_NAME = "djp34wxni";
-const CLOUD_PRESET = "school_attendance";
+// ── CONFIG ──────────────────────────────────────────────────
+function getConfig() {
+  return {
+    teacher:     localStorage.getItem('cfg_teacher') || '',
+    scriptUrl:   localStorage.getItem('cfg_scriptUrl') || '',
+    cloudName:   localStorage.getItem('cfg_cloudName') || '',
+    cloudPreset: localStorage.getItem('cfg_cloudPreset') || 'school_attendance',
+  };
+}
 
-let count = +localStorage.getItem("count") || 0;
-let done = JSON.parse(localStorage.getItem("done") || "[]");
-let currentStudent = null;
-let scanner = null;
+function saveConfig() {
+  const teacher     = document.getElementById('cfgTeacher').value.trim();
+  const scriptUrl   = document.getElementById('cfgScriptUrl').value.trim();
+  const cloudName   = document.getElementById('cfgCloudName').value.trim();
+  const cloudPreset = document.getElementById('cfgCloudPreset').value.trim() || 'school_attendance';
 
-function getShift() { return new Date().getHours() < 13 ? "Mañana" : "Tarde"; }
+  if (!teacher || !scriptUrl || !cloudName) {
+    alert('Por favor completá todos los campos obligatorios.');
+    return;
+  }
+  localStorage.setItem('cfg_teacher', teacher);
+  localStorage.setItem('cfg_scriptUrl', scriptUrl);
+  localStorage.setItem('cfg_cloudName', cloudName);
+  localStorage.setItem('cfg_cloudPreset', cloudPreset);
+  localStorage.setItem('cfg_configured', '1');
+  startApp();
+}
 
+function saveConfigModal() {
+  const teacher     = document.getElementById('modalTeacher').value.trim();
+  const scriptUrl   = document.getElementById('modalScriptUrl').value.trim();
+  const cloudName   = document.getElementById('modalCloudName').value.trim();
+  const cloudPreset = document.getElementById('modalCloudPreset').value.trim() || 'school_attendance';
+
+  if (!teacher || !scriptUrl || !cloudName) {
+    alert('Por favor completá todos los campos obligatorios.');
+    return;
+  }
+  localStorage.setItem('cfg_teacher', teacher);
+  localStorage.setItem('cfg_scriptUrl', scriptUrl);
+  localStorage.setItem('cfg_cloudName', cloudName);
+  localStorage.setItem('cfg_cloudPreset', cloudPreset);
+  closeConfig();
+  updateTeacherBadge();
+  alert('✅ Configuración guardada correctamente.');
+}
+
+function openConfig() {
+  const cfg = getConfig();
+  document.getElementById('modalTeacher').value     = cfg.teacher;
+  document.getElementById('modalScriptUrl').value   = cfg.scriptUrl;
+  document.getElementById('modalCloudName').value   = cfg.cloudName;
+  document.getElementById('modalCloudPreset').value = cfg.cloudPreset;
+  document.getElementById('configModal').classList.add('active');
+}
+
+function closeConfig() {
+  document.getElementById('configModal').classList.remove('active');
+}
+
+function updateTeacherBadge() {
+  const cfg = getConfig();
+  const badge = document.getElementById('teacherBadge');
+  badge.textContent = cfg.teacher ? `👤 ${cfg.teacher}` : '';
+  badge.style.display = cfg.teacher ? 'block' : 'none';
+}
+
+// ── APP INIT ────────────────────────────────────────────────
+function startApp() {
+  document.getElementById('mainHeader').style.display = 'flex';
+  updateTeacherBadge();
+  updateHeader();
+  showScreen('screenScanner');
+  startScanner();
+}
+
+window.onload = function() {
+  const configured = localStorage.getItem('cfg_configured');
+  if (configured) {
+    startApp();
+  }
+  // else: setup screen is already shown by default
+};
+
+// ── HEADER ──────────────────────────────────────────────────
 function updateHeader() {
-  document.getElementById("shift-badge").textContent = "Turno " + getShift();
-  document.getElementById("count-num").textContent = count;
+  const now = new Date();
+  document.getElementById('dayNum').textContent = now.getDate();
+  const hour = now.getHours();
+  const shift = hour < 13 ? 'Mañana' : 'Tarde';
+  document.getElementById('shiftBadge').textContent = `Turno ${shift}`;
 }
 
-async function uploadPhoto(base64) {
-  const blob = await (await fetch(base64)).blob();
-  const fd = new FormData();
-  fd.append("file", blob);
-  fd.append("upload_preset", CLOUD_PRESET);
-  fd.append("folder", "asistencia_escolar");
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method:"POST", body:fd });
-  const data = await res.json();
-  return data.secure_url;
+function getShift() {
+  return new Date().getHours() < 13 ? 'Mañana' : 'Tarde';
 }
 
-async function saveRecord(record) {
-  var params = new URLSearchParams({
-    id: record.id,
-    name: record.name,
-    date: record.date,
-    time: record.time,
-    shift: record.shift,
-    photoUrl: record.photoUrl || ""
-  });
-  await fetch(SCRIPT_URL + "?" + params.toString(), {
-    method: "GET",
-    mode: "no-cors"
-  });
-}
+function getToday() {
+  return new Date().toLocaleDateString('es-AR');
 }
 
-function stopScanner() {
-  if (scanner) { scanner.stop().catch(()=>{}); scanner = null; }
+// ── SCREENS ─────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-function showScan() {
-  stopScanner();
-  const main = document.getElementById("main");
-  main.innerHTML = `
-    <div>
-      <div id="qr-reader"></div>
-      <p class="hint" id="scan-hint">Iniciando cámara...</p>
-    </div>
-  `;
+// ── SCANNER ─────────────────────────────────────────────────
+let html5QrCode = null;
 
-  Html5Qrcode.getCameras().then(devices => {
-    if (!devices.length) { document.getElementById("scan-hint").textContent = "⚠️ No se encontró cámara"; return; }
-    const back = devices.find(d => /back|rear|trasera|environment/i.test(d.label));
-    const camId = back ? back.id : devices[devices.length-1].id;
-    scanner = new Html5Qrcode("qr-reader");
-    scanner.start(
-      camId,
-      { fps:15, qrbox:{width:250,height:250} },
-      (text) => { stopScanner(); handleScanned(text); },
-      () => {}
-    ).then(() => {
-      document.getElementById("scan-hint").textContent = "📷 Apuntá al código QR del alumno";
-    }).catch(e => {
-      document.getElementById("scan-hint").textContent = "⚠️ Error: " + e;
-    });
-  }).catch(e => {
-    document.getElementById("scan-hint").textContent = "⚠️ Error cámara: " + e;
-  });
-}
-
-function handleScanned(qr) {
-  const parts = qr.split("|");
-  const id = parts[0].trim();
-  const name = parts.slice(1).join(" ").trim();
-  const shift = getShift();
-  const key = `${id}_${shift}_${new Date().toLocaleDateString("es-AR")}`;
-  if (done.includes(key)) { showDuplicate(name||id, shift); return; }
-  currentStudent = { id, name };
-  showCapture();
-}
-
-function showCapture() {
-  const main = document.getElementById("main");
-  main.innerHTML = `
-    <div class="student-tag">
-      <span class="sid">#${currentStudent.id}</span>
-      <span class="sname">${currentStudent.name || "Alumno"}</span>
-    </div>
-    <div class="video-box" id="cam-box">
-      <video id="front-video" muted playsinline autoplay></video>
-      <button class="snap-btn" id="snap-btn" disabled>📸</button>
-    </div>
-    <button class="btn-ghost" onclick="showScan()">Cancelar</button>
-  `;
-
-  navigator.mediaDevices.getUserMedia({ video:{ facingMode:"user" } })
-    .then(stream => {
-      const video = document.getElementById("front-video");
-      video.srcObject = stream;
-      video.play();
-      document.getElementById("snap-btn").disabled = false;
-      document.getElementById("snap-btn").onclick = () => snapPhoto(stream);
-    })
-    .catch(e => alert("Error cámara frontal: " + e.message));
-}
-
-function snapPhoto(stream) {
-  const video = document.getElementById("front-video");
-  const canvas = document.createElement("canvas");
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext("2d").drawImage(video, 0, 0);
-  const photo = canvas.toDataURL("image/jpeg", 0.8);
-  stream.getTracks().forEach(t => t.stop());
-
-  const box = document.getElementById("cam-box");
-  box.innerHTML = `<img src="${photo}" alt="preview"/>`;
-
-  const main = document.getElementById("main");
-  const row = document.createElement("div");
-  row.className = "row";
-  row.innerHTML = `
-    <button class="btn-red" id="retake-btn">🔄 Repetir</button>
-    <button class="btn-green" id="confirm-btn">✅ Confirmar</button>
-  `;
-  box.after(row);
-
-  document.getElementById("retake-btn").onclick = showCapture;
-  document.getElementById("confirm-btn").onclick = () => confirmPhoto(photo);
-}
-
-async function confirmPhoto(photo) {
-  const main = document.getElementById("main");
-  main.innerHTML = `<div class="loading"><div class="spinner"></div><p style="color:#8892a4">Subiendo foto...</p></div>`;
-
-  try {
-    const photoUrl = await uploadPhoto(photo);
-    main.querySelector("p").textContent = "Guardando en planilla...";
-    const now = new Date();
-    const shift = getShift();
-    const record = {
-      id: currentStudent.id,
-      name: currentStudent.name,
-      date: now.toLocaleDateString("es-AR"),
-      time: now.toLocaleTimeString("es-AR", {hour:"2-digit",minute:"2-digit"}),
-      shift, photoUrl
-    };
-    await saveRecord(record);
-    const key = `${record.id}_${shift}_${record.date}`;
-    done.push(key);
-    localStorage.setItem("done", JSON.stringify(done));
-    count++;
-    localStorage.setItem("count", count);
-    updateHeader();
-    showSuccess(record);
-  } catch(e) {
-    alert("Error: " + e.message);
-    showScan();
+function startScanner() {
+  if (html5QrCode) {
+    html5QrCode.stop().catch(() => {}).finally(() => { html5QrCode = null; initScanner(); });
+  } else {
+    initScanner();
   }
 }
 
-function showSuccess(record) {
-  const main = document.getElementById("main");
-  main.innerHTML = `
-    <div class="card" style="border:1px solid #00e67633">
-      <div class="card-icon">✅</div>
-      <h2 class="card-title" style="color:#00e676">¡Registrado!</h2>
-      <div class="grid">
-        <span class="lbl">Alumno</span><span class="val">${record.name}</span>
-        <span class="lbl">ID</span><span class="val">${record.id}</span>
-        <span class="lbl">Turno</span><span class="val">${record.shift}</span>
-        <span class="lbl">Hora</span><span class="val">${record.time}</span>
-      </div>
-      ${record.photoUrl ? `<img src="${record.photoUrl}" class="thumb" alt="foto"/>` : ""}
-      <button class="btn-primary" onclick="showScan()">Escanear siguiente →</button>
-    </div>
-  `;
+function initScanner() {
+  html5QrCode = new Html5Qrcode("reader");
+  html5QrCode.start(
+    { facingMode: "environment" },
+    { fps: 12, qrbox: { width: 240, height: 240 } },
+    onQrSuccess,
+    () => {}
+  ).catch(err => {
+    document.getElementById('reader').innerHTML =
+      '<p style="color:#ff4444;padding:20px;text-align:center">Error al acceder a la cámara. Verificá los permisos.</p>';
+  });
 }
 
-function showDuplicate(name, shift) {
-  const main = document.getElementById("main");
-  main.innerHTML = `
-    <div class="card" style="border:1px solid #ff980033">
-      <div class="card-icon">⚠️</div>
-      <h2 class="card-title" style="color:#ff9800">Ya registrado</h2>
-      <p style="color:#8892a4"><b style="color:#e8eaf6">${name}</b> ya fue registrado en el turno <b style="color:#e8eaf6">${shift}</b>.</p>
-      <button class="btn-primary" onclick="showScan()">Escanear otro →</button>
-    </div>
-  `;
+function onQrSuccess(decodedText) {
+  if (html5QrCode) {
+    html5QrCode.stop().catch(() => {});
+    html5QrCode = null;
+  }
+
+  let studentId, studentName;
+  if (decodedText.includes('|')) {
+    [studentId, studentName] = decodedText.split('|');
+  } else {
+    studentId = decodedText;
+    studentName = decodedText;
+  }
+
+  studentId   = (studentId || '').trim();
+  studentName = (studentName || '').trim();
+
+  // Check duplicate
+  const shift = getShift();
+  const today = getToday();
+  const key = `att_${studentId}_${today}_${shift}`;
+  const existing = localStorage.getItem(key);
+
+  if (existing) {
+    const prev = JSON.parse(existing);
+    document.getElementById('dName').textContent = studentName;
+    document.getElementById('dTime').textContent = prev.time;
+    showScreen('screenDuplicate');
+    return;
+  }
+
+  currentStudent = { id: studentId, name: studentName };
+  showCaptureScreen(studentName);
 }
 
-// Iniciar
-updateHeader();
-showScan();
+// ── CAPTURE ─────────────────────────────────────────────────
+let currentStudent = null;
+let capturedBlob   = null;
+let cameraStream   = null;
+
+function showCaptureScreen(name) {
+  document.getElementById('captureName').textContent = name;
+  document.getElementById('captureMeta').textContent =
+    `📅 ${getToday()}  ·  ⏰ ${new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'})}  ·  🌅 Turno ${getShift()}`;
+  showScreen('screenCapture');
+  startFrontCamera();
+}
+
+function startFrontCamera() {
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+    .then(stream => {
+      cameraStream = stream;
+      document.getElementById('cameraPreview').srcObject = stream;
+    })
+    .catch(() => alert('No se pudo acceder a la cámara frontal.'));
+}
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+}
+
+function retakePhoto() {
+  capturedBlob = null;
+  const video = document.getElementById('cameraPreview');
+  video.style.display = 'block';
+  startFrontCamera();
+}
+
+function confirmPhoto() {
+  const video = document.getElementById('cameraPreview');
+  const canvas = document.createElement('canvas');
+  canvas.width  = video.videoWidth  || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  canvas.toBlob(blob => {
+    capturedBlob = blob;
+    stopCamera();
+    saveRecord();
+  }, 'image/jpeg', 0.85);
+}
+
+function cancelCapture() {
+  stopCamera();
+  currentStudent = null;
+  showScreen('screenScanner');
+  startScanner();
+}
+
+// ── SAVE RECORD ─────────────────────────────────────────────
+let todayCount = parseInt(localStorage.getItem('count_' + getToday()) || '0');
+
+async function saveRecord() {
+  showScreen('screenLoading');
+  const cfg = getConfig();
+
+  const now   = new Date();
+  const date  = getToday();
+  const time  = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+  const shift = getShift();
+
+  let photoUrl = '';
+
+  // Upload photo to Cloudinary
+  try {
+    const formData = new FormData();
+    formData.append('file', capturedBlob, 'photo.jpg');
+    formData.append('upload_preset', cfg.cloudPreset);
+    formData.append('folder', 'asistencia_escolar');
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cfg.cloudName}/image/upload`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    photoUrl = data.secure_url || '';
+  } catch (e) {
+    photoUrl = 'sin-foto';
+  }
+
+  // Save to Google Sheets
+  try {
+    const params = new URLSearchParams({
+      id:       currentStudent.id,
+      name:     currentStudent.name,
+      teacher:  cfg.teacher,
+      date:     date,
+      time:     time,
+      shift:    shift,
+      photoUrl: photoUrl
+    });
+    await fetch(cfg.scriptUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+  } catch (e) {}
+
+  // Save locally to avoid duplicates
+  const key = `att_${currentStudent.id}_${date}_${shift}`;
+  localStorage.setItem(key, JSON.stringify({ time, photoUrl }));
+
+  // Update counter
+  todayCount++;
+  localStorage.setItem('count_' + date, todayCount);
+
+  // Show success
+  document.getElementById('sName').textContent    = currentStudent.name;
+  document.getElementById('sId').textContent      = currentStudent.id;
+  document.getElementById('sTeacher').textContent = cfg.teacher;
+  document.getElementById('sShift').textContent   = shift;
+  document.getElementById('sTime').textContent    = time;
+  document.getElementById('counterBadge').textContent = `${todayCount} registro${todayCount !== 1 ? 's' : ''} hoy`;
+
+  if (photoUrl && photoUrl !== 'sin-foto') {
+    document.getElementById('successPhoto').src = photoUrl;
+    document.getElementById('successPhoto').style.display = 'block';
+  } else {
+    document.getElementById('successPhoto').style.display = 'none';
+  }
+
+  showScreen('screenSuccess');
+}
+
+function nextScan() {
+  currentStudent = null;
+  capturedBlob   = null;
+  showScreen('screenScanner');
+  startScanner();
+}
 </script>
 </body>
 </html>
