@@ -394,7 +394,7 @@
 <script>
 // ── CONFIG ──────────────────────────────────────────────────
 function getConfig() {
-  var teacher     = (localStorage.getItem("cfg_teacher") || "").trim();
+  var teacher = (localStorage.getItem("cfg_teacher") || localStorage.getItem("cfg teacher") || "").trim();
   var scriptUrl   = (localStorage.getItem("cfg_scriptUrl") || "").trim();
   var cloudName   = (localStorage.getItem("cfg_cloudName") || "").trim();
   var cloudPreset = (localStorage.getItem("cfg_cloudPreset") || "school_attendance").trim();
