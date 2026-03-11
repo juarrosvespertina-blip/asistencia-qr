@@ -9,244 +9,64 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0d1b2a;
-      color: #e0e0e0;
-      min-height: 100vh;
-    }
-
-    /* ── HEADER ── */
-    .header {
-      background: linear-gradient(135deg, #0d1b2a, #1a3a5c);
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 2px solid #00e5ff33;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: #0d1b2a; color: #e0e0e0; min-height: 100vh; }
+    .header { background: linear-gradient(135deg, #0d1b2a, #1a3a5c); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #00e5ff33; }
     .header-left { display: flex; align-items: center; gap: 10px; }
     .header-logo { font-size: 28px; }
     .header-title { font-size: 18px; font-weight: 700; color: #00e5ff; }
-    .header-shift {
-      font-size: 11px; background: #00e5ff22;
-      color: #00e5ff; border: 1px solid #00e5ff44;
-      padding: 2px 8px; border-radius: 20px;
-    }
+    .header-shift { font-size: 11px; background: #00e5ff22; color: #00e5ff; border: 1px solid #00e5ff44; padding: 2px 8px; border-radius: 20px; }
     .header-right { display: flex; align-items: center; gap: 8px; }
-    .header-date {
-      background: #00e5ff;
-      color: #0d1b2a;
-      font-weight: 800;
-      font-size: 22px;
-      width: 44px; height: 44px;
-      border-radius: 10px;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      line-height: 1;
-    }
+    .header-date { background: #00e5ff; color: #0d1b2a; font-weight: 800; font-size: 22px; width: 44px; height: 44px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
     .header-date span { font-size: 9px; font-weight: 600; }
-    .btn-config {
-      background: #ffffff15;
-      border: 1px solid #ffffff30;
-      color: #ccc;
-      width: 36px; height: 36px;
-      border-radius: 8px;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    /* ── SCREENS ── */
+    .btn-config { background: #ffffff15; border: 1px solid #ffffff30; color: #ccc; width: 36px; height: 36px; border-radius: 8px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .screen { display: none; padding: 16px; }
     .screen.active { display: block; }
-
-    /* ── SETUP SCREEN ── */
-    .setup-card {
-      background: linear-gradient(135deg, #1a3a5c, #0d2b4a);
-      border: 1px solid #00e5ff33;
-      border-radius: 16px;
-      padding: 24px;
-      max-width: 420px;
-      margin: 20px auto;
-    }
+    .setup-card { background: linear-gradient(135deg, #1a3a5c, #0d2b4a); border: 1px solid #00e5ff33; border-radius: 16px; padding: 24px; max-width: 420px; margin: 20px auto; }
     .setup-icon { font-size: 48px; text-align: center; margin-bottom: 12px; }
     .setup-title { font-size: 20px; font-weight: 700; color: #00e5ff; text-align: center; margin-bottom: 6px; }
     .setup-subtitle { font-size: 13px; color: #aaa; text-align: center; margin-bottom: 20px; }
     .form-group { margin-bottom: 16px; }
     .form-label { font-size: 12px; color: #00e5ff; font-weight: 600; margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
-    .form-input {
-      width: 100%;
-      background: #0d1b2a;
-      border: 1px solid #00e5ff44;
-      color: #fff;
-      padding: 12px 14px;
-      border-radius: 10px;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .form-input:focus { border-color: #00e5ff; }
+    .form-input { width: 100%; background: #0d1b2a; border: 1px solid #00e5ff44; color: #fff; padding: 12px 14px; border-radius: 10px; font-size: 14px; outline: none; }
     .form-hint { font-size: 11px; color: #666; margin-top: 4px; }
-    .btn-save {
-      width: 100%;
-      background: linear-gradient(135deg, #00e5ff, #0099bb);
-      color: #0d1b2a;
-      font-weight: 800;
-      font-size: 16px;
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      margin-top: 8px;
-    }
-    .setup-steps {
-      background: #ffffff08;
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 20px;
-    }
-    .setup-step { font-size: 12px; color: #aaa; margin-bottom: 6px; display: flex; gap: 8px; }
-    .setup-step-num { color: #00e5ff; font-weight: 700; min-width: 16px; }
-
-    /* ── SCANNER ── */
-    .scanner-box {
-      background: #1a3a5c22;
-      border: 2px solid #00e5ff33;
-      border-radius: 16px;
-      overflow: hidden;
-      margin-bottom: 16px;
-    }
+    .btn-save { width: 100%; background: linear-gradient(135deg, #00e5ff, #0099bb); color: #0d1b2a; font-weight: 800; font-size: 16px; padding: 14px; border: none; border-radius: 12px; cursor: pointer; margin-top: 8px; }
+    .scanner-box { background: #1a3a5c22; border: 2px solid #00e5ff33; border-radius: 16px; overflow: hidden; margin-bottom: 16px; }
     #reader { width: 100%; }
     .scanner-hint { text-align: center; padding: 12px; font-size: 13px; color: #aaa; }
-
-    /* ── CAPTURE ── */
-    .capture-info {
-      background: linear-gradient(135deg, #1a3a5c, #0d2b4a);
-      border: 1px solid #00e5ff33;
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 14px;
-    }
+    .capture-info { background: linear-gradient(135deg, #1a3a5c, #0d2b4a); border: 1px solid #00e5ff33; border-radius: 12px; padding: 14px; margin-bottom: 14px; }
     .capture-name { font-size: 20px; font-weight: 700; color: #00e5ff; margin-bottom: 4px; }
     .capture-meta { font-size: 13px; color: #aaa; }
-    #cameraPreview {
-      width: 100%; border-radius: 12px; background: #000;
-      max-height: 340px; object-fit: cover; display: block;
-    }
+    #cameraPreview { width: 100%; border-radius: 12px; background: #000; max-height: 340px; object-fit: cover; display: block; }
     .capture-btns { display: flex; gap: 10px; margin-top: 12px; }
-    .btn-repeat {
-      flex: 1; padding: 14px; border-radius: 12px;
-      border: 2px solid #ff4444; background: transparent;
-      color: #ff4444; font-weight: 700; font-size: 15px; cursor: pointer;
-    }
-    .btn-confirm {
-      flex: 1.5; padding: 14px; border-radius: 12px;
-      border: none; background: linear-gradient(135deg, #00c851, #007e33);
-      color: #fff; font-weight: 700; font-size: 15px; cursor: pointer;
-    }
-    .btn-cancel {
-      width: 100%; padding: 12px; border-radius: 12px;
-      border: 1px solid #ffffff22; background: transparent;
-      color: #888; font-size: 14px; cursor: pointer; margin-top: 8px;
-    }
-
-    /* ── LOADING ── */
-    .loading-screen {
-      text-align: center; padding: 60px 20px;
-    }
-    .spinner {
-      width: 56px; height: 56px;
-      border: 4px solid #00e5ff33;
-      border-top-color: #00e5ff;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 20px;
-    }
+    .btn-repeat { flex: 1; padding: 14px; border-radius: 12px; border: 2px solid #ff4444; background: transparent; color: #ff4444; font-weight: 700; font-size: 15px; cursor: pointer; }
+    .btn-confirm { flex: 1.5; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #00c851, #007e33); color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; }
+    .btn-cancel { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ffffff22; background: transparent; color: #888; font-size: 14px; cursor: pointer; margin-top: 8px; }
+    .loading-screen { text-align: center; padding: 60px 20px; }
+    .spinner { width: 56px; height: 56px; border: 4px solid #00e5ff33; border-top-color: #00e5ff; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 20px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── SUCCESS ── */
-    .success-card {
-      background: linear-gradient(135deg, #1a3a5c, #0d2b4a);
-      border: 1px solid #00c85144;
-      border-radius: 16px;
-      padding: 24px;
-      text-align: center;
-      max-width: 420px;
-      margin: 0 auto;
-    }
+    .success-card { background: linear-gradient(135deg, #1a3a5c, #0d2b4a); border: 1px solid #00c85144; border-radius: 16px; padding: 24px; text-align: center; max-width: 420px; margin: 0 auto; }
     .success-icon { font-size: 64px; margin-bottom: 12px; }
     .success-title { font-size: 26px; font-weight: 800; color: #00c851; margin-bottom: 16px; }
-    .success-detail {
-      background: #ffffff08;
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 16px;
-      text-align: left;
-    }
+    .success-detail { background: #ffffff08; border-radius: 10px; padding: 14px; margin-bottom: 16px; text-align: left; }
     .detail-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #ffffff10; }
     .detail-row:last-child { border-bottom: none; }
     .detail-label { color: #888; font-size: 13px; }
     .detail-value { color: #fff; font-size: 13px; font-weight: 600; }
     .success-photo { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #00c851; object-fit: cover; margin: 0 auto 16px; display: block; }
-    .btn-next {
-      width: 100%; padding: 16px; border-radius: 12px;
-      border: none; background: linear-gradient(135deg, #00e5ff, #0099bb);
-      color: #0d1b2a; font-weight: 800; font-size: 16px; cursor: pointer;
-    }
-    .counter-badge {
-      display: inline-block;
-      background: #00e5ff22;
-      border: 1px solid #00e5ff44;
-      color: #00e5ff;
-      font-size: 12px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      margin-bottom: 16px;
-    }
-
-    /* ── DUPLICATE ── */
-    .duplicate-card {
-      background: linear-gradient(135deg, #2a1a0d, #4a2b0d);
-      border: 1px solid #ff990044;
-      border-radius: 16px;
-      padding: 24px;
-      text-align: center;
-    }
+    .btn-next { width: 100%; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(135deg, #00e5ff, #0099bb); color: #0d1b2a; font-weight: 800; font-size: 16px; cursor: pointer; }
+    .counter-badge { display: inline-block; background: #00e5ff22; border: 1px solid #00e5ff44; color: #00e5ff; font-size: 12px; padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+    .duplicate-card { background: linear-gradient(135deg, #2a1a0d, #4a2b0d); border: 1px solid #ff990044; border-radius: 16px; padding: 24px; text-align: center; }
     .duplicate-title { font-size: 22px; font-weight: 800; color: #ff9900; margin: 12px 0; }
-
-    /* ── CONFIG MODAL ── */
-    .modal-overlay {
-      display: none;
-      position: fixed; inset: 0;
-      background: #000000cc;
-      z-index: 1000;
-      padding: 20px;
-      overflow-y: auto;
-    }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: #000000cc; z-index: 1000; padding: 20px; overflow-y: auto; }
     .modal-overlay.active { display: flex; align-items: flex-start; justify-content: center; padding-top: 40px; }
-    .modal-card {
-      background: #1a3a5c;
-      border: 1px solid #00e5ff33;
-      border-radius: 16px;
-      padding: 24px;
-      width: 100%;
-      max-width: 420px;
-    }
+    .modal-card { background: #1a3a5c; border: 1px solid #00e5ff33; border-radius: 16px; padding: 24px; width: 100%; max-width: 420px; }
     .modal-title { font-size: 18px; font-weight: 700; color: #00e5ff; margin-bottom: 16px; }
-    .btn-close-modal {
-      width: 100%; padding: 12px; border-radius: 10px;
-      border: 1px solid #ffffff22; background: transparent;
-      color: #888; font-size: 14px; cursor: pointer; margin-top: 8px;
-    }
-    .teacher-name-badge {
-      font-size: 12px; color: #aaa; text-align: center; padding: 4px 0 8px;
-    }
+    .btn-close-modal { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ffffff22; background: transparent; color: #888; font-size: 14px; cursor: pointer; margin-top: 8px; }
+    .teacher-badge { font-size: 12px; color: #aaa; text-align: center; padding: 4px 0 8px; }
   </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header" id="mainHeader" style="display:none">
   <div class="header-left">
     <div class="header-logo">🏫</div>
@@ -260,58 +80,46 @@
       <strong id="dayNum">--</strong>
       <span>HOY</span>
     </div>
-    <button class="btn-config" onclick="openConfig()" title="Configuración">⚙️</button>
+    <button class="btn-config" onclick="openConfig()">⚙️</button>
   </div>
 </div>
+<div class="teacher-badge" id="teacherBadge" style="display:none"></div>
 
-<!-- TEACHER BADGE -->
-<div class="teacher-name-badge" id="teacherBadge" style="display:none"></div>
-
-<!-- ── SCREEN: SETUP ── -->
+<!-- SETUP -->
 <div class="screen active" id="screenSetup">
   <div class="setup-card">
     <div class="setup-icon">⚙️</div>
     <div class="setup-title">Configuración inicial</div>
     <div class="setup-subtitle">Ingresá tus datos una sola vez</div>
-
-    <div class="setup-steps">
-      <div class="setup-step"><span class="setup-step-num">1</span> Creá tu Google Sheets y tu Apps Script</div>
-      <div class="setup-step"><span class="setup-step-num">2</span> Creá tu cuenta en Cloudinary</div>
-      <div class="setup-step"><span class="setup-step-num">3</span> Completá los datos de abajo y guardá</div>
-    </div>
-
     <div class="form-group">
       <label class="form-label">Tu nombre completo</label>
-      <input class="form-input" id="cfgTeacher" type="text" placeholder="Ej: Prof. García María" />
+      <input class="form-input" id="inp_teacher" type="text" placeholder="Ej: Prof. García María" autocomplete="off" />
     </div>
     <div class="form-group">
       <label class="form-label">URL de tu Apps Script</label>
-      <input class="form-input" id="cfgScriptUrl" type="url" placeholder="https://script.google.com/macros/s/..." />
+      <input class="form-input" id="inp_script" type="text" placeholder="https://script.google.com/macros/s/..." autocomplete="off" />
       <div class="form-hint">La URL que obtuviste al implementar el Apps Script</div>
     </div>
     <div class="form-group">
       <label class="form-label">Cloud Name (Cloudinary)</label>
-      <input class="form-input" id="cfgCloudName" type="text" placeholder="Ej: djp34wxni" />
+      <input class="form-input" id="inp_cloud" type="text" placeholder="Ej: djp34wxni" autocomplete="off" />
       <div class="form-hint">Lo encontrás en el Dashboard de cloudinary.com</div>
     </div>
     <div class="form-group">
       <label class="form-label">Upload Preset (Cloudinary)</label>
-      <input class="form-input" id="cfgCloudPreset" type="text" placeholder="school_attendance" value="school_attendance" />
-      <div class="form-hint">Por defecto: school_attendance</div>
+      <input class="form-input" id="inp_preset" type="text" value="school_attendance" autocomplete="off" />
     </div>
-    <button class="btn-save" onclick="saveConfig()">✅ Guardar y comenzar</button>
+    <button class="btn-save" onclick="doSaveConfig()">✅ Guardar y comenzar</button>
   </div>
 </div>
 
-<!-- ── SCREEN: SCANNER ── -->
+<!-- SCANNER -->
 <div class="screen" id="screenScanner">
-  <div class="scanner-box">
-    <div id="reader"></div>
-  </div>
+  <div class="scanner-box"><div id="reader"></div></div>
   <div class="scanner-hint">📷 Apuntá la cámara al código QR del alumno</div>
 </div>
 
-<!-- ── SCREEN: CAPTURE ── -->
+<!-- CAPTURE -->
 <div class="screen" id="screenCapture">
   <div class="capture-info">
     <div class="capture-name" id="captureName">—</div>
@@ -325,7 +133,7 @@
   <button class="btn-cancel" onclick="cancelCapture()">Cancelar</button>
 </div>
 
-<!-- ── SCREEN: LOADING ── -->
+<!-- LOADING -->
 <div class="screen" id="screenLoading">
   <div class="loading-screen">
     <div class="spinner"></div>
@@ -333,13 +141,13 @@
   </div>
 </div>
 
-<!-- ── SCREEN: SUCCESS ── -->
+<!-- SUCCESS -->
 <div class="screen" id="screenSuccess">
   <div class="success-card">
     <div class="success-icon">✅</div>
     <div class="success-title">¡Registrado!</div>
     <div class="counter-badge" id="counterBadge">0 registros hoy</div>
-    <img id="successPhoto" class="success-photo" src="" alt="foto" />
+    <img id="successPhoto" class="success-photo" src="" alt="foto" style="display:none" />
     <div class="success-detail">
       <div class="detail-row"><span class="detail-label">Alumno</span><span class="detail-value" id="sName">—</span></div>
       <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value" id="sId">—</span></div>
@@ -351,7 +159,7 @@
   </div>
 </div>
 
-<!-- ── SCREEN: DUPLICATE ── -->
+<!-- DUPLICATE -->
 <div class="screen" id="screenDuplicate">
   <div class="duplicate-card">
     <div style="font-size:56px">⚠️</div>
@@ -366,85 +174,93 @@
   </div>
 </div>
 
-<!-- ── MODAL: CONFIG ── -->
+<!-- CONFIG MODAL -->
 <div class="modal-overlay" id="configModal">
   <div class="modal-card">
     <div class="modal-title">⚙️ Configuración</div>
     <div class="form-group">
       <label class="form-label">Tu nombre completo</label>
-      <input class="form-input" id="modalTeacher" type="text" />
+      <input class="form-input" id="mod_teacher" type="text" autocomplete="off" />
     </div>
     <div class="form-group">
       <label class="form-label">URL de tu Apps Script</label>
-      <input class="form-input" id="modalScriptUrl" type="url" />
+      <input class="form-input" id="mod_script" type="text" autocomplete="off" />
     </div>
     <div class="form-group">
       <label class="form-label">Cloud Name (Cloudinary)</label>
-      <input class="form-input" id="modalCloudName" type="text" />
+      <input class="form-input" id="mod_cloud" type="text" autocomplete="off" />
     </div>
     <div class="form-group">
       <label class="form-label">Upload Preset (Cloudinary)</label>
-      <input class="form-input" id="modalCloudPreset" type="text" />
+      <input class="form-input" id="mod_preset" type="text" autocomplete="off" />
     </div>
-    <button class="btn-save" onclick="saveConfigModal()">✅ Guardar cambios</button>
+    <button class="btn-save" onclick="doSaveModal()">✅ Guardar cambios</button>
     <button class="btn-close-modal" onclick="closeConfig()">Cancelar</button>
   </div>
 </div>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────────
-function getConfig() {
-  var teacher = (localStorage.getItem("cfg_teacher") || localStorage.getItem("cfg teacher") || "").trim();
-  var scriptUrl   = (localStorage.getItem("cfg_scriptUrl") || "").trim();
-  var cloudName   = (localStorage.getItem("cfg_cloudName") || "").trim();
-  var cloudPreset = (localStorage.getItem("cfg_cloudPreset") || "school_attendance").trim();
-  return { teacher: teacher, scriptUrl: scriptUrl, cloudName: cloudName, cloudPreset: cloudPreset };
+// ── STORAGE KEYS ─────────────────────────────────────────────
+var KEY_TEACHER = 'asist_teacher';
+var KEY_SCRIPT  = 'asist_script';
+var KEY_CLOUD   = 'asist_cloud';
+var KEY_PRESET  = 'asist_preset';
+var KEY_READY   = 'asist_ready';
+
+// ── GET / SET CONFIG ─────────────────────────────────────────
+function getCfg() {
+  return {
+    teacher : window.localStorage.getItem(KEY_TEACHER) || '',
+    script  : window.localStorage.getItem(KEY_SCRIPT)  || '',
+    cloud   : window.localStorage.getItem(KEY_CLOUD)   || '',
+    preset  : window.localStorage.getItem(KEY_PRESET)  || 'school_attendance'
+  };
 }
 
+function setCfg(teacher, script, cloud, preset) {
+  window.localStorage.setItem(KEY_TEACHER, teacher);
+  window.localStorage.setItem(KEY_SCRIPT,  script);
+  window.localStorage.setItem(KEY_CLOUD,   cloud);
+  window.localStorage.setItem(KEY_PRESET,  preset || 'school_attendance');
+  window.localStorage.setItem(KEY_READY,   '1');
+}
 
-function saveConfig() {
-  const teacher     = document.getElementById('cfgTeacher').value.trim();
-  const scriptUrl   = document.getElementById('cfgScriptUrl').value.trim();
-  const cloudName   = document.getElementById('cfgCloudName').value.trim();
-  const cloudPreset = document.getElementById('cfgCloudPreset').value.trim() || 'school_attendance';
-
-  if (!teacher || !scriptUrl || !cloudName) {
-    alert('Por favor completá todos los campos obligatorios.');
+// ── SAVE CONFIG (setup screen) ────────────────────────────────
+function doSaveConfig() {
+  var teacher = document.getElementById('inp_teacher').value.trim();
+  var script  = document.getElementById('inp_script').value.trim();
+  var cloud   = document.getElementById('inp_cloud').value.trim();
+  var preset  = document.getElementById('inp_preset').value.trim() || 'school_attendance';
+  if (!teacher || !script || !cloud) {
+    alert('Por favor completá todos los campos.');
     return;
   }
-  localStorage.setItem('cfg_teacher', teacher);
-  localStorage.setItem('cfg_scriptUrl', scriptUrl);
-  localStorage.setItem('cfg_cloudName', cloudName);
-  localStorage.setItem('cfg_cloudPreset', cloudPreset);
-  localStorage.setItem('cfg_configured', '1');
+  setCfg(teacher, script, cloud, preset);
   startApp();
 }
 
-function saveConfigModal() {
-  const teacher     = document.getElementById('modalTeacher').value.trim();
-  const scriptUrl   = document.getElementById('modalScriptUrl').value.trim();
-  const cloudName   = document.getElementById('modalCloudName').value.trim();
-  const cloudPreset = document.getElementById('modalCloudPreset').value.trim() || 'school_attendance';
-
-  if (!teacher || !scriptUrl || !cloudName) {
-    alert('Por favor completá todos los campos obligatorios.');
+// ── SAVE CONFIG (modal) ───────────────────────────────────────
+function doSaveModal() {
+  var teacher = document.getElementById('mod_teacher').value.trim();
+  var script  = document.getElementById('mod_script').value.trim();
+  var cloud   = document.getElementById('mod_cloud').value.trim();
+  var preset  = document.getElementById('mod_preset').value.trim() || 'school_attendance';
+  if (!teacher || !script || !cloud) {
+    alert('Por favor completá todos los campos.');
     return;
   }
-  localStorage.setItem('cfg_teacher', teacher);
-  localStorage.setItem('cfg_scriptUrl', scriptUrl);
-  localStorage.setItem('cfg_cloudName', cloudName);
-  localStorage.setItem('cfg_cloudPreset', cloudPreset);
+  setCfg(teacher, script, cloud, preset);
   closeConfig();
   updateTeacherBadge();
-  alert('✅ Configuración guardada correctamente.');
+  alert('✅ Configuración guardada.');
 }
 
 function openConfig() {
-  const cfg = getConfig();
-  document.getElementById('modalTeacher').value     = cfg.teacher;
-  document.getElementById('modalScriptUrl').value   = cfg.scriptUrl;
-  document.getElementById('modalCloudName').value   = cfg.cloudName;
-  document.getElementById('modalCloudPreset').value = cfg.cloudPreset;
+  var cfg = getCfg();
+  document.getElementById('mod_teacher').value = cfg.teacher;
+  document.getElementById('mod_script').value  = cfg.script;
+  document.getElementById('mod_cloud').value   = cfg.cloud;
+  document.getElementById('mod_preset').value  = cfg.preset;
   document.getElementById('configModal').classList.add('active');
 }
 
@@ -453,13 +269,17 @@ function closeConfig() {
 }
 
 function updateTeacherBadge() {
-  const cfg = getConfig();
-  const badge = document.getElementById('teacherBadge');
-  badge.textContent = cfg.teacher ? `👤 ${cfg.teacher}` : '';
-  badge.style.display = cfg.teacher ? 'block' : 'none';
+  var cfg = getCfg();
+  var el = document.getElementById('teacherBadge');
+  if (cfg.teacher) {
+    el.textContent = '👤 ' + cfg.teacher;
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
 }
 
-// ── APP INIT ────────────────────────────────────────────────
+// ── START APP ─────────────────────────────────────────────────
 function startApp() {
   document.getElementById('mainHeader').style.display = 'flex';
   updateTeacherBadge();
@@ -469,20 +289,17 @@ function startApp() {
 }
 
 window.onload = function() {
-  const configured = localStorage.getItem('cfg_configured');
-  if (configured) {
+  var ready = window.localStorage.getItem(KEY_READY);
+  if (ready === '1') {
     startApp();
   }
-  // else: setup screen is already shown by default
 };
 
-// ── HEADER ──────────────────────────────────────────────────
+// ── HEADER ────────────────────────────────────────────────────
 function updateHeader() {
-  const now = new Date();
+  var now = new Date();
   document.getElementById('dayNum').textContent = now.getDate();
-  const hour = now.getHours();
-  const shift = hour < 13 ? 'Mañana' : 'Tarde';
-  document.getElementById('shiftBadge').textContent = `Turno ${shift}`;
+  document.getElementById('shiftBadge').textContent = 'Turno ' + getShift();
 }
 
 function getShift() {
@@ -493,114 +310,92 @@ function getToday() {
   return new Date().toLocaleDateString('es-AR');
 }
 
-// ── SCREENS ─────────────────────────────────────────────────
+// ── SCREENS ───────────────────────────────────────────────────
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
 }
 
-// ── SCANNER ─────────────────────────────────────────────────
-let html5QrCode = null;
+// ── SCANNER ───────────────────────────────────────────────────
+var html5QrCode = null;
 
 function startScanner() {
   if (html5QrCode) {
-    html5QrCode.stop().catch(() => {}).finally(() => { html5QrCode = null; initScanner(); });
+    html5QrCode.stop().catch(function(){}).finally(function(){ html5QrCode = null; initScanner(); });
   } else {
     initScanner();
   }
 }
 
 function initScanner() {
-  html5QrCode = new Html5Qrcode("reader");
+  html5QrCode = new Html5Qrcode('reader');
   html5QrCode.start(
-    { facingMode: "environment" },
+    { facingMode: 'environment' },
     { fps: 12, qrbox: { width: 240, height: 240 } },
     onQrSuccess,
-    () => {}
-  ).catch(err => {
-    document.getElementById('reader').innerHTML =
-      '<p style="color:#ff4444;padding:20px;text-align:center">Error al acceder a la cámara. Verificá los permisos.</p>';
+    function(){}
+  ).catch(function() {
+    document.getElementById('reader').innerHTML = '<p style="color:#ff4444;padding:20px;text-align:center">Error al acceder a la cámara.</p>';
   });
 }
 
-function onQrSuccess(decodedText) {
-  if (html5QrCode) {
-    html5QrCode.stop().catch(() => {});
-    html5QrCode = null;
-  }
+function onQrSuccess(text) {
+  if (html5QrCode) { html5QrCode.stop().catch(function(){}); html5QrCode = null; }
+  var parts = text.split('|');
+  var sid   = (parts[0] || text).trim();
+  var sname = (parts[1] || text).trim();
 
-  let studentId, studentName;
-  if (decodedText.includes('|')) {
-    [studentId, studentName] = decodedText.split('|');
-  } else {
-    studentId = decodedText;
-    studentName = decodedText;
-  }
+  var shift = getShift();
+  var today = getToday();
+  var key   = 'dup_' + sid + '_' + today + '_' + shift;
+  var prev  = window.localStorage.getItem(key);
 
-  studentId   = (studentId || '').trim();
-  studentName = (studentName || '').trim();
-
-  // Check duplicate
-  const shift = getShift();
-  const today = getToday();
-  const key = `att_${studentId}_${today}_${shift}`;
-  const existing = localStorage.getItem(key);
-
-  if (existing) {
-    const prev = JSON.parse(existing);
-    document.getElementById('dName').textContent = studentName;
-    document.getElementById('dTime').textContent = prev.time;
+  if (prev) {
+    var p = JSON.parse(prev);
+    document.getElementById('dName').textContent = sname;
+    document.getElementById('dTime').textContent = p.time;
     showScreen('screenDuplicate');
     return;
   }
 
-  currentStudent = { id: studentId, name: studentName };
-  showCaptureScreen(studentName);
-}
-
-// ── CAPTURE ─────────────────────────────────────────────────
-let currentStudent = null;
-let capturedBlob   = null;
-let cameraStream   = null;
-
-function showCaptureScreen(name) {
-  document.getElementById('captureName').textContent = name;
+  currentStudent = { id: sid, name: sname };
+  document.getElementById('captureName').textContent = sname;
   document.getElementById('captureMeta').textContent =
-    `📅 ${getToday()}  ·  ⏰ ${new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'})}  ·  🌅 Turno ${getShift()}`;
+    '📅 ' + today + '  ·  ⏰ ' + new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'}) + '  ·  🌅 Turno ' + shift;
   showScreen('screenCapture');
   startFrontCamera();
 }
 
+// ── CAMERA ────────────────────────────────────────────────────
+var currentStudent = null;
+var capturedBlob   = null;
+var cameraStream   = null;
+
 function startFrontCamera() {
   navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
-    .then(stream => {
+    .then(function(stream) {
       cameraStream = stream;
       document.getElementById('cameraPreview').srcObject = stream;
     })
-    .catch(() => alert('No se pudo acceder a la cámara frontal.'));
+    .catch(function() { alert('No se pudo acceder a la cámara frontal.'); });
 }
 
 function stopCamera() {
-  if (cameraStream) {
-    cameraStream.getTracks().forEach(t => t.stop());
-    cameraStream = null;
-  }
+  if (cameraStream) { cameraStream.getTracks().forEach(function(t){ t.stop(); }); cameraStream = null; }
 }
 
 function retakePhoto() {
   capturedBlob = null;
-  const video = document.getElementById('cameraPreview');
-  video.style.display = 'block';
   startFrontCamera();
 }
 
 function confirmPhoto() {
-  const video = document.getElementById('cameraPreview');
-  const canvas = document.createElement('canvas');
+  var video  = document.getElementById('cameraPreview');
+  var canvas = document.createElement('canvas');
   canvas.width  = video.videoWidth  || 640;
   canvas.height = video.videoHeight || 480;
   canvas.getContext('2d').drawImage(video, 0, 0);
-  canvas.toBlob(blob => {
+  canvas.toBlob(function(blob) {
     capturedBlob = blob;
     stopCamera();
     saveRecord();
@@ -614,72 +409,66 @@ function cancelCapture() {
   startScanner();
 }
 
-// ── SAVE RECORD ─────────────────────────────────────────────
-let todayCount = parseInt(localStorage.getItem('count_' + getToday()) || '0');
+// ── SAVE RECORD ───────────────────────────────────────────────
+var todayCount = parseInt(window.localStorage.getItem('cnt_' + new Date().toLocaleDateString('es-AR')) || '0');
 
 async function saveRecord() {
   showScreen('screenLoading');
-  const cfg = getConfig();
 
-  const now   = new Date();
-  const date  = getToday();
-  const time  = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-  const shift = getShift();
+  var cfg    = getCfg();
+  var now    = new Date();
+  var date   = getToday();
+  var time   = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+  var shift  = getShift();
+  var teacher = cfg.teacher;
 
-  let photoUrl = '';
+  var photoUrl = 'sin-foto';
 
-  // Upload photo to Cloudinary
+  // Upload to Cloudinary
   try {
-    const formData = new FormData();
-    formData.append('file', capturedBlob, 'photo.jpg');
-    formData.append('upload_preset', cfg.cloudPreset);
-    formData.append('folder', 'asistencia_escolar');
+    var fd = new FormData();
+    fd.append('file', capturedBlob, 'photo.jpg');
+    fd.append('upload_preset', cfg.preset);
+    fd.append('folder', 'asistencia_escolar');
+    var res  = await fetch('https://api.cloudinary.com/v1_1/' + cfg.cloud + '/image/upload', { method: 'POST', body: fd });
+    var data = await res.json();
+    if (data.secure_url) photoUrl = data.secure_url;
+  } catch(e) {}
 
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${cfg.cloudName}/image/upload`, {
-      method: 'POST',
-      body: formData
-    });
-    const data = await res.json();
-    photoUrl = data.secure_url || '';
-  } catch (e) {
-    photoUrl = 'sin-foto';
-  }
-
-  // Save to Google Sheets
+  // Send to Google Sheets
   try {
-    const params = new URLSearchParams({
-      id:       currentStudent.id,
-      name:     currentStudent.name,
-      teacher:  cfg.teacher,
-      date:     date,
-      time:     time,
-      shift:    shift,
-      photoUrl: photoUrl
-    });
-    await fetch(cfg.scriptUrl + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
-  } catch (e) {}
+    var params = 'id='       + encodeURIComponent(currentStudent.id)
+               + '&name='    + encodeURIComponent(currentStudent.name)
+               + '&teacher=' + encodeURIComponent(teacher)
+               + '&date='    + encodeURIComponent(date)
+               + '&time='    + encodeURIComponent(time)
+               + '&shift='   + encodeURIComponent(shift)
+               + '&photoUrl='+ encodeURIComponent(photoUrl);
+    await fetch(cfg.script + '?' + params, { method: 'GET', mode: 'no-cors' });
+  } catch(e) {}
 
-  // Save locally to avoid duplicates
-  const key = `att_${currentStudent.id}_${date}_${shift}`;
-  localStorage.setItem(key, JSON.stringify({ time, photoUrl }));
+  // Mark as registered locally
+  var key = 'dup_' + currentStudent.id + '_' + date + '_' + shift;
+  window.localStorage.setItem(key, JSON.stringify({ time: time }));
 
   // Update counter
   todayCount++;
-  localStorage.setItem('count_' + date, todayCount);
+  window.localStorage.setItem('cnt_' + date, String(todayCount));
 
   // Show success
   document.getElementById('sName').textContent    = currentStudent.name;
   document.getElementById('sId').textContent      = currentStudent.id;
-  document.getElementById('sTeacher').textContent = cfg.teacher;
+  document.getElementById('sTeacher').textContent = teacher;
   document.getElementById('sShift').textContent   = shift;
   document.getElementById('sTime').textContent    = time;
-  document.getElementById('counterBadge').textContent = `${todayCount} registro${todayCount !== 1 ? 's' : ''} hoy`;
+  document.getElementById('counterBadge').textContent = todayCount + ' registro' + (todayCount !== 1 ? 's' : '') + ' hoy';
 
-  if (photoUrl && photoUrl !== 'sin-foto') {
-    document.getElementById('successPhoto').src = photoUrl;
-    document.getElementById('successPhoto').style.display = 'block';
+  var photoEl = document.getElementById('successPhoto');
+  if (photoUrl !== 'sin-foto') {
+    photoEl.src = photoUrl;
+    photoEl.style.display = 'block';
   } else {
-    document.getElementById('successPhoto').style.display = 'none';
+    photoEl.style.display = 'none';
   }
 
   showScreen('screenSuccess');
