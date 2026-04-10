@@ -10,7 +10,6 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Segoe UI', sans-serif; background: #0d1b2a; color: #e0e0e0; min-height: 100vh; }
-
     .header { background: linear-gradient(135deg, #0d1b2a, #1a3a5c); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #00e5ff33; }
     .header-left { display: flex; align-items: center; gap: 10px; }
     .header-logo { font-size: 28px; }
@@ -21,7 +20,6 @@
     .header-date span { font-size: 9px; font-weight: 600; }
     .btn-config { background: #ffffff15; border: 1px solid #ffffff30; color: #ccc; width: 36px; height: 36px; border-radius: 8px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .teacher-badge { font-size: 12px; color: #aaa; text-align: center; padding: 4px 0 8px; }
-
     .screen { display: none; padding: 16px; }
     .screen.active { display: block; }
 
@@ -41,11 +39,12 @@
     #reader { width: 100%; }
     .scanner-hint { text-align: center; padding: 12px; font-size: 13px; color: #aaa; }
 
-    /* CONFIRM SCREEN */
+    /* CONFIRM */
     .confirm-card { background: linear-gradient(135deg, #1a3a5c, #0d2b4a); border: 1px solid #00e5ff33; border-radius: 16px; padding: 24px; max-width: 420px; margin: 0 auto; text-align: center; }
-    .confirm-photo-wrap { position: relative; width: 160px; height: 160px; margin: 0 auto 20px; }
-    .confirm-photo { width: 160px; height: 160px; border-radius: 50%; border: 4px solid #00e5ff; object-fit: cover; background: #1a3a5c; }
+    .confirm-photo-wrap { width: 160px; height: 160px; margin: 0 auto 16px; position: relative; }
+    .confirm-photo { width: 160px; height: 160px; border-radius: 50%; border: 4px solid #00e5ff; object-fit: cover; display: none; }
     .confirm-photo-placeholder { width: 160px; height: 160px; border-radius: 50%; border: 4px solid #00e5ff44; background: #1a3a5c; display: flex; align-items: center; justify-content: center; font-size: 72px; }
+    .photo-status { font-size: 12px; color: #aaa; margin-bottom: 12px; min-height: 18px; }
     .confirm-name { font-size: 22px; font-weight: 800; color: #00e5ff; margin-bottom: 4px; }
     .confirm-id { font-size: 13px; color: #aaa; margin-bottom: 16px; }
     .confirm-detail { background: #ffffff08; border-radius: 10px; padding: 14px; margin-bottom: 20px; text-align: left; }
@@ -54,15 +53,15 @@
     .detail-label { color: #888; font-size: 13px; }
     .detail-value { color: #fff; font-size: 13px; font-weight: 600; }
     .confirm-btns { display: flex; gap: 10px; margin-bottom: 10px; }
-    .btn-cancel-scan { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ffffff22; background: transparent; color: #888; font-size: 14px; cursor: pointer; }
     .btn-repeat { flex: 1; padding: 14px; border-radius: 12px; border: 2px solid #ff4444; background: transparent; color: #ff4444; font-weight: 700; font-size: 15px; cursor: pointer; }
     .btn-confirm { flex: 1.5; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #00c851, #007e33); color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; }
-    .photo-loading { font-size: 12px; color: #aaa; margin-bottom: 8px; }
+    .btn-cancel-scan { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ffffff22; background: transparent; color: #888; font-size: 14px; cursor: pointer; }
 
     /* LOADING */
     .loading-screen { text-align: center; padding: 60px 20px; }
     .spinner { width: 56px; height: 56px; border: 4px solid #00e5ff33; border-top-color: #00e5ff; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 20px; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-msg { color: #aaa; font-size: 15px; }
 
     /* SUCCESS */
     .success-card { background: linear-gradient(135deg, #1a3a5c, #0d2b4a); border: 1px solid #00c85144; border-radius: 16px; padding: 24px; text-align: center; max-width: 420px; margin: 0 auto; }
@@ -97,10 +96,7 @@
     </div>
   </div>
   <div class="header-right">
-    <div class="header-date">
-      <strong id="dayNum">--</strong>
-      <span>HOY</span>
-    </div>
+    <div class="header-date"><strong id="dayNum">--</strong><span>HOY</span></div>
     <button class="btn-config" onclick="openConfig()">⚙️</button>
   </div>
 </div>
@@ -121,15 +117,6 @@
       <input class="form-input" id="inp_script" type="text" placeholder="https://script.google.com/macros/s/..." autocomplete="off" />
       <div class="form-hint">La URL que obtuviste al implementar el Apps Script</div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Cloud Name (Cloudinary)</label>
-      <input class="form-input" id="inp_cloud" type="text" placeholder="Ej: djp34wxni" autocomplete="off" />
-      <div class="form-hint">Lo encontrás en el Dashboard de cloudinary.com</div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Upload Preset (Cloudinary)</label>
-      <input class="form-input" id="inp_preset" type="text" value="school_attendance" autocomplete="off" />
-    </div>
     <button class="btn-save" onclick="doSaveConfig()">✅ Guardar y comenzar</button>
   </div>
 </div>
@@ -143,9 +130,9 @@
 <!-- CONFIRM -->
 <div class="screen" id="screenConfirm">
   <div class="confirm-card">
-    <p class="photo-loading" id="photoStatus">Buscando foto...</p>
+    <div class="photo-status" id="photoStatus">Buscando foto...</div>
     <div class="confirm-photo-wrap">
-      <img id="confirmPhoto" class="confirm-photo" src="" alt="foto" style="display:none" onerror="showPhotoPlaceholder()" />
+      <img id="confirmPhoto" class="confirm-photo" src="" alt="foto" />
       <div id="confirmPhotoPlaceholder" class="confirm-photo-placeholder">👤</div>
     </div>
     <div class="confirm-name" id="confirmName">—</div>
@@ -167,7 +154,7 @@
 <div class="screen" id="screenLoading">
   <div class="loading-screen">
     <div class="spinner"></div>
-    <p style="color:#aaa;font-size:15px">Guardando registro...</p>
+    <p class="loading-msg" id="loadingMsg">Guardando registro...</p>
   </div>
 </div>
 
@@ -217,61 +204,42 @@
       <label class="form-label">URL de tu Apps Script</label>
       <input class="form-input" id="mod_script" type="text" autocomplete="off" />
     </div>
-    <div class="form-group">
-      <label class="form-label">Cloud Name (Cloudinary)</label>
-      <input class="form-input" id="mod_cloud" type="text" autocomplete="off" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Upload Preset (Cloudinary)</label>
-      <input class="form-input" id="mod_preset" type="text" autocomplete="off" />
-    </div>
     <button class="btn-save" onclick="doSaveModal()">✅ Guardar cambios</button>
     <button class="btn-close-modal" onclick="closeConfig()">Cancelar</button>
   </div>
 </div>
 
 <script>
-// ── STORAGE KEYS ─────────────────────────────────────────────
 var KEY_TEACHER = 'asist_teacher';
 var KEY_SCRIPT  = 'asist_script';
-var KEY_CLOUD   = 'asist_cloud';
-var KEY_PRESET  = 'asist_preset';
 var KEY_READY   = 'asist_ready';
 
 function getCfg() {
   return {
     teacher : (window.localStorage.getItem(KEY_TEACHER) || '').trim(),
     script  : (window.localStorage.getItem(KEY_SCRIPT)  || '').trim(),
-    cloud   : (window.localStorage.getItem(KEY_CLOUD)   || '').trim(),
-    preset  : (window.localStorage.getItem(KEY_PRESET)  || 'school_attendance').trim()
   };
 }
 
-function setCfg(teacher, script, cloud, preset) {
+function setCfg(teacher, script) {
   window.localStorage.setItem(KEY_TEACHER, teacher);
   window.localStorage.setItem(KEY_SCRIPT,  script);
-  window.localStorage.setItem(KEY_CLOUD,   cloud);
-  window.localStorage.setItem(KEY_PRESET,  preset || 'school_attendance');
   window.localStorage.setItem(KEY_READY,   '1');
 }
 
 function doSaveConfig() {
   var teacher = document.getElementById('inp_teacher').value.trim();
   var script  = document.getElementById('inp_script').value.trim();
-  var cloud   = document.getElementById('inp_cloud').value.trim();
-  var preset  = document.getElementById('inp_preset').value.trim() || 'school_attendance';
-  if (!teacher || !script || !cloud) { alert('Por favor completá todos los campos.'); return; }
-  setCfg(teacher, script, cloud, preset);
+  if (!teacher || !script) { alert('Por favor completá todos los campos.'); return; }
+  setCfg(teacher, script);
   startApp();
 }
 
 function doSaveModal() {
   var teacher = document.getElementById('mod_teacher').value.trim();
   var script  = document.getElementById('mod_script').value.trim();
-  var cloud   = document.getElementById('mod_cloud').value.trim();
-  var preset  = document.getElementById('mod_preset').value.trim() || 'school_attendance';
-  if (!teacher || !script || !cloud) { alert('Por favor completá todos los campos.'); return; }
-  setCfg(teacher, script, cloud, preset);
+  if (!teacher || !script) { alert('Por favor completá todos los campos.'); return; }
+  setCfg(teacher, script);
   closeConfig();
   updateTeacherBadge();
   alert('✅ Configuración guardada.');
@@ -281,8 +249,6 @@ function openConfig() {
   var cfg = getCfg();
   document.getElementById('mod_teacher').value = cfg.teacher;
   document.getElementById('mod_script').value  = cfg.script;
-  document.getElementById('mod_cloud').value   = cfg.cloud;
-  document.getElementById('mod_preset').value  = cfg.preset;
   document.getElementById('configModal').classList.add('active');
 }
 
@@ -297,7 +263,6 @@ function updateTeacherBadge() {
   else { el.style.display = 'none'; }
 }
 
-// ── INIT ─────────────────────────────────────────────────────
 function startApp() {
   document.getElementById('mainHeader').style.display = 'flex';
   updateTeacherBadge();
@@ -324,7 +289,7 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
 }
 
-// ── SCANNER ───────────────────────────────────────────────────
+// SCANNER
 var html5QrCode = null;
 
 function startScanner() {
@@ -344,8 +309,8 @@ function initScanner() {
   });
 }
 
-// ── QR SUCCESS ────────────────────────────────────────────────
 var currentStudent = null;
+var currentPhotoUrl = '';
 
 function onQrSuccess(text) {
   if (html5QrCode) { html5QrCode.stop().catch(function(){}); html5QrCode = null; }
@@ -367,15 +332,16 @@ function onQrSuccess(text) {
     return;
   }
 
-  currentStudent = { id: sid, name: sname };
+  currentStudent  = { id: sid, name: sname };
+  currentPhotoUrl = '';
   showConfirmScreen(sid, sname);
 }
 
-// ── CONFIRM SCREEN ────────────────────────────────────────────
+// CONFIRM SCREEN
 function showConfirmScreen(sid, sname) {
   var now   = new Date();
   var today = getToday();
-  var time  = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+  var time  = now.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
   var shift = getShift();
   var cfg   = getCfg();
 
@@ -385,105 +351,106 @@ function showConfirmScreen(sid, sname) {
   document.getElementById('confirmTime').textContent  = time;
   document.getElementById('confirmShift').textContent = shift;
 
-  // Build Cloudinary photo URL using public_id = student ID
-  var photoUrl = 'https://res.cloudinary.com/' + cfg.cloud + '/image/upload/asistencia_alumnos/' + sid + '.jpg';
-
-  document.getElementById('photoStatus').textContent = 'Cargando foto...';
+  // Reset photo
   var img = document.getElementById('confirmPhoto');
-  var placeholder = document.getElementById('confirmPhotoPlaceholder');
-
+  var ph  = document.getElementById('confirmPhotoPlaceholder');
   img.style.display = 'none';
-  placeholder.style.display = 'flex';
-
-  img.onload = function() {
-    img.style.display = 'block';
-    placeholder.style.display = 'none';
-    document.getElementById('photoStatus').textContent = '✅ Foto encontrada';
-  };
-  img.onerror = function() {
-    img.style.display = 'none';
-    placeholder.style.display = 'flex';
-    document.getElementById('photoStatus').textContent = '📷 Sin foto registrada';
-  };
-  img.src = photoUrl;
+  ph.style.display  = 'flex';
+  document.getElementById('photoStatus').textContent = '🔍 Buscando foto...';
 
   showScreen('screenConfirm');
-}
 
-function showPhotoPlaceholder() {
-  document.getElementById('confirmPhoto').style.display = 'none';
-  document.getElementById('confirmPhotoPlaceholder').style.display = 'flex';
+  // Buscar foto en Google Sheets via Apps Script
+  fetch(cfg.script + '?action=getPhoto&id=' + encodeURIComponent(sid))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.status === 'ok' && data.photoUrl) {
+        currentPhotoUrl = data.photoUrl;
+        img.onload = function() {
+          img.style.display = 'block';
+          ph.style.display  = 'none';
+          document.getElementById('photoStatus').textContent = '✅ Foto encontrada';
+        };
+        img.onerror = function() {
+          img.style.display = 'none';
+          ph.style.display  = 'flex';
+          document.getElementById('photoStatus').textContent = '📷 Sin foto registrada';
+        };
+        img.src = data.photoUrl;
+      } else {
+        document.getElementById('photoStatus').textContent = '📷 Sin foto registrada';
+      }
+    })
+    .catch(function() {
+      document.getElementById('photoStatus').textContent = '📷 Sin foto registrada';
+    });
 }
 
 function cancelConfirm() {
-  currentStudent = null;
+  currentStudent  = null;
+  currentPhotoUrl = '';
   showScreen('screenScanner');
   startScanner();
 }
 
-// ── CONFIRM ATTENDANCE ────────────────────────────────────────
+// SAVE RECORD
 var todayCount = parseInt(window.localStorage.getItem('cnt_' + new Date().toLocaleDateString('es-AR')) || '0');
 
 async function confirmAttendance() {
   showScreen('screenLoading');
+  document.getElementById('loadingMsg').textContent = 'Guardando registro...';
 
-  var cfg    = getCfg();
-  var now    = new Date();
-  var date   = getToday();
-  var time   = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-  var shift  = getShift();
-  var teacher = cfg.teacher;
+  var cfg   = getCfg();
+  var now   = new Date();
+  var date  = getToday();
+  var time  = now.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+  var shift = getShift();
 
-  // Use the Cloudinary photo URL already loaded
-  var photoUrl = 'https://res.cloudinary.com/' + cfg.cloud + '/image/upload/asistencia_alumnos/' + currentStudent.id + '.jpg';
-
-  // Send to Google Sheets
+  // Guardar en Google Sheets
   try {
     var params = 'id='        + encodeURIComponent(currentStudent.id)
                + '&name='    + encodeURIComponent(currentStudent.name)
-               + '&teacher=' + encodeURIComponent(teacher)
+               + '&teacher=' + encodeURIComponent(cfg.teacher)
                + '&date='    + encodeURIComponent(date)
                + '&time='    + encodeURIComponent(time)
                + '&shift='   + encodeURIComponent(shift)
-               + '&photoUrl='+ encodeURIComponent(photoUrl);
+               + '&photoUrl='+ encodeURIComponent(currentPhotoUrl);
     await fetch(cfg.script + '?' + params, { method: 'GET', mode: 'no-cors' });
   } catch(e) {}
 
-  // Mark locally
+  // Marcar como registrado localmente
   var key = 'dup_' + currentStudent.id + '_' + date + '_' + shift;
   window.localStorage.setItem(key, JSON.stringify({ time: time }));
 
-  // Counter
+  // Contador
   todayCount++;
   window.localStorage.setItem('cnt_' + date, String(todayCount));
 
-  // Success screen
+  // Pantalla de éxito
   document.getElementById('sName').textContent    = currentStudent.name;
   document.getElementById('sId').textContent      = currentStudent.id;
-  document.getElementById('sTeacher').textContent = teacher;
+  document.getElementById('sTeacher').textContent = cfg.teacher;
   document.getElementById('sShift').textContent   = shift;
   document.getElementById('sTime').textContent    = time;
   document.getElementById('counterBadge').textContent = todayCount + ' registro' + (todayCount !== 1 ? 's' : '') + ' hoy';
 
-  // Show photo on success
-  var imgConfirm = document.getElementById('confirmPhoto');
   var successImg = document.getElementById('successPhoto');
-  var successPlaceholder = document.getElementById('successPhotoPlaceholder');
-
-  if (imgConfirm.style.display !== 'none' && imgConfirm.src) {
-    successImg.src = imgConfirm.src;
+  var successPh  = document.getElementById('successPhotoPlaceholder');
+  if (currentPhotoUrl) {
+    successImg.src = currentPhotoUrl;
     successImg.style.display = 'block';
-    successPlaceholder.style.display = 'none';
+    successPh.style.display  = 'none';
   } else {
     successImg.style.display = 'none';
-    successPlaceholder.style.display = 'flex';
+    successPh.style.display  = 'flex';
   }
 
   showScreen('screenSuccess');
 }
 
 function nextScan() {
-  currentStudent = null;
+  currentStudent  = null;
+  currentPhotoUrl = '';
   showScreen('screenScanner');
   startScanner();
 }
