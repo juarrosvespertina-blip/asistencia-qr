@@ -12,9 +12,10 @@
     body { font-family: 'Segoe UI', sans-serif; background: #0d1b2a; color: #e0e0e0; min-height: 100vh; }
     .header { background: linear-gradient(135deg, #0d1b2a, #1a3a5c); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #00e5ff33; }
     .header-left { display: flex; align-items: center; gap: 10px; }
-    .header-logo { font-size: 28px; }
+    .header-logo-img { width: 42px; height: 42px; object-fit: contain; border-radius: 8px; }
     .header-title { font-size: 18px; font-weight: 700; color: #00e5ff; }
     .header-shift { font-size: 11px; background: #00e5ff22; color: #00e5ff; border: 1px solid #00e5ff44; padding: 2px 8px; border-radius: 20px; }
+    .header-copyright { font-size: 9px; color: #ffffff55; letter-spacing: 0.5px; }
     .header-right { display: flex; align-items: center; gap: 8px; }
     .header-date { background: #00e5ff; color: #0d1b2a; font-weight: 800; font-size: 22px; width: 44px; height: 44px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
     .header-date span { font-size: 9px; font-weight: 600; }
@@ -89,10 +90,11 @@
 <!-- HEADER -->
 <div class="header" id="mainHeader" style="display:none">
   <div class="header-left">
-    <div class="header-logo">🏫</div>
+    <img src="https://res.cloudinary.com/djp34wxni/image/upload/v1775878168/logo_png_schf6f.png" class="header-logo-img" alt="Logo" />
     <div>
       <div class="header-title">Asistencia QR</div>
       <div class="header-shift" id="shiftBadge">Turno Mañana</div>
+      <div class="header-copyright">copyright-Machs</div>
     </div>
   </div>
   <div class="header-right">
