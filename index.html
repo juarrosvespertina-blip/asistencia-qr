@@ -46,6 +46,11 @@
     .confirm-photo { width: 160px; height: 160px; border-radius: 50%; border: 4px solid #00e5ff; object-fit: cover; display: none; }
     .confirm-photo-placeholder { width: 160px; height: 160px; border-radius: 50%; border: 4px solid #00e5ff44; background: #1a3a5c; display: flex; align-items: center; justify-content: center; font-size: 72px; }
     .photo-status { font-size: 12px; color: #aaa; margin-bottom: 12px; min-height: 18px; }
+    .section-selector { margin-bottom: 16px; }
+    .section-label { font-size: 12px; color: #00e5ff; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+    .section-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .btn-section { padding: 10px 6px; border-radius: 10px; border: 1.5px solid #00e5ff44; background: #0d1b2a; color: #aaa; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .btn-section.selected { background: #00e5ff22; border-color: #00e5ff; color: #00e5ff; }
     .confirm-name { font-size: 22px; font-weight: 800; color: #00e5ff; margin-bottom: 4px; }
     .confirm-id { font-size: 13px; color: #aaa; margin-bottom: 16px; }
     .confirm-detail { background: #ffffff08; border-radius: 10px; padding: 14px; margin-bottom: 20px; text-align: left; }
@@ -139,6 +144,24 @@
     </div>
     <div class="confirm-name" id="confirmName">—</div>
     <div class="confirm-id" id="confirmIdText">—</div>
+    <div class="section-selector">
+      <span class="section-label">📚 Seleccioná la sección:</span>
+      <div class="section-grid" id="sectionGrid">
+        <button class="btn-section" onclick="selectSection(this, 'Primero A')">Primero A</button>
+        <button class="btn-section" onclick="selectSection(this, 'Primero B')">Primero B</button>
+        <button class="btn-section" onclick="selectSection(this, 'Primero C')">Primero C</button>
+        <button class="btn-section" onclick="selectSection(this, 'Primero D')">Primero D</button>
+        <button class="btn-section" onclick="selectSection(this, 'Primero E')">Primero E</button>
+        <button class="btn-section" onclick="selectSection(this, 'Segundo A')">Segundo A</button>
+        <button class="btn-section" onclick="selectSection(this, 'Segundo B')">Segundo B</button>
+        <button class="btn-section" onclick="selectSection(this, 'Segundo C')">Segundo C</button>
+        <button class="btn-section" onclick="selectSection(this, 'Segundo D')">Segundo D</button>
+        <button class="btn-section" onclick="selectSection(this, 'Tercero A')">Tercero A</button>
+        <button class="btn-section" onclick="selectSection(this, 'Tercero B')">Tercero B</button>
+        <button class="btn-section" onclick="selectSection(this, 'Tercero C')">Tercero C</button>
+        <button class="btn-section" onclick="selectSection(this, 'Tercero D')">Tercero D</button>
+      </div>
+    </div>
     <div class="confirm-detail">
       <div class="detail-row"><span class="detail-label">Fecha</span><span class="detail-value" id="confirmDate">—</span></div>
       <div class="detail-row"><span class="detail-label">Hora</span><span class="detail-value" id="confirmTime">—</span></div>
@@ -171,6 +194,7 @@
     <div class="confirm-detail">
       <div class="detail-row"><span class="detail-label">Alumno</span><span class="detail-value" id="sName">—</span></div>
       <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value" id="sId">—</span></div>
+      <div class="detail-row"><span class="detail-label">Sección</span><span class="detail-value" id="sSection">—</span></div>
       <div class="detail-row"><span class="detail-label">Docente</span><span class="detail-value" id="sTeacher">—</span></div>
       <div class="detail-row"><span class="detail-label">Turno</span><span class="detail-value" id="sShift">—</span></div>
       <div class="detail-row"><span class="detail-label">Hora</span><span class="detail-value" id="sTime">—</span></div>
@@ -311,7 +335,14 @@ function initScanner() {
   });
 }
 
-var currentStudent = null;
+var currentStudent  = null;
+var currentSection  = "";
+
+function selectSection(btn, section) {
+  document.querySelectorAll('.btn-section').forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  currentSection = section;
+}
 var currentPhotoUrl = '';
 
 function onQrSuccess(text) {
@@ -399,6 +430,10 @@ function cancelConfirm() {
 var todayCount = parseInt(window.localStorage.getItem('cnt_' + new Date().toLocaleDateString('es-AR')) || '0');
 
 async function confirmAttendance() {
+  if (!currentSection) {
+    alert('Por favor seleccioná la sección del alumno.');
+    return;
+  }
   showScreen('screenLoading');
   document.getElementById('loadingMsg').textContent = 'Guardando registro...';
 
@@ -412,6 +447,7 @@ async function confirmAttendance() {
   try {
     var params = 'id='        + encodeURIComponent(currentStudent.id)
                + '&name='    + encodeURIComponent(currentStudent.name)
+               + '&section=' + encodeURIComponent(currentSection)
                + '&teacher=' + encodeURIComponent(cfg.teacher)
                + '&date='    + encodeURIComponent(date)
                + '&time='    + encodeURIComponent(time)
@@ -430,6 +466,7 @@ async function confirmAttendance() {
 
   // Pantalla de éxito
   document.getElementById('sName').textContent    = currentStudent.name;
+  document.getElementById('sSection').textContent = currentSection;
   document.getElementById('sId').textContent      = currentStudent.id;
   document.getElementById('sTeacher').textContent = cfg.teacher;
   document.getElementById('sShift').textContent   = shift;
@@ -453,6 +490,8 @@ async function confirmAttendance() {
 function nextScan() {
   currentStudent  = null;
   currentPhotoUrl = '';
+  currentSection  = '';
+  document.querySelectorAll('.btn-section').forEach(function(b){ b.classList.remove('selected'); });
   showScreen('screenScanner');
   startScanner();
 }
